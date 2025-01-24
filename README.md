@@ -1,4 +1,3 @@
-add sudo chmod -R 777 /opt/lampp/htdocs/reports_php/storage
 
 # Laravel Project Setup and Running Guide
 
