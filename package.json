@@ -1,0 +1,24 @@
+{
+    "private": true,
+    "scripts": {
+        "dev": "npm run development",
+        "development": "mix",
+        "watch": "mix watch",
+        "watch-poll": "mix watch -- --watch-options-poll=1000",
+        "hot": "mix watch --hot",
+        "prod": "npm run production",
+        "production": "mix --production",
+
+        "front:serve": "cd FrontEndApp && pnpm dev",
+        "front:build": "cd FrontEndApp && pnpm build",
+        "serve": "concurrently \"php artisan serve --port=8080\" \"yarn front:serve\"",
+        "deploy": "yarn  front:build && php artisan migrate"
+    },
+    "devDependencies": {
+        "axios": "^0.21",
+        "concurrently": "^7.6.0",
+        "laravel-mix": "^6.0.6",
+        "lodash": "^4.17.19",
+        "postcss": "^8.1.14"
+    }
+}
