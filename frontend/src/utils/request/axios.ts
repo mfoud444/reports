@@ -2,7 +2,7 @@ import axios, { type AxiosResponse } from 'axios'
 import applyCaseMiddleware from 'axios-case-converter';
 import config from '../config.json';
 
-export const baseURL = config.baseURL;
+export const baseURL = config.baseURLAPI;
 
 const service = applyCaseMiddleware(axios.create({
   baseURL:baseURL,

@@ -3,6 +3,71 @@
 
 This guide will walk you through the steps required to set up and run a Laravel project on your local machine, using **Yarn** for the Laravel backend and **PNPM** for the frontend.
 
+---
+
+## Features System
+
+The project includes the following features:
+
+1. **Two Separate Interfaces:**
+   - **User Interface:** Designed to be simple and intuitive, allowing end-users to interact with the system seamlessly.
+   - **Admin Interface:** Provides full control over data management and settings, with advanced tools for performance monitoring and decision-making.
+
+2. **Process Evaluation Capability:**
+   - Both users and admins can evaluate various processes, helping to improve efficiency and make informed decisions.
+
+3. **Use of Modern Development Tools:**
+   - The project is built using the latest technologies and development tools to ensure speed, security, and scalability for the future.
+
+4. **Dashboard for Statistics Display:**
+   - An interactive dashboard that visually displays key statistics and data, making it easy to track and analyze information.
+
+5. **Flexible Data Visibility Control:**
+   - Customizable data display options to suit your needs, providing great flexibility for future expansion.
+   - Manageable data includes:
+     - Data Report Management
+     - Regions
+     - Facilities
+     - Report Types
+     - Training Chapters
+     - Implementing Agencies
+     - Resources
+     - Performance Indicators
+     - Maintenance Types
+     - Request Types
+     - Maintenance Request Agencies
+     - Departments
+
+6. **Theme:**
+   - A modern and flexible design that can be customized to match your brand identity.
+
+7. **Arabic and English Language Support:**
+   - The system supports both Arabic and English to cater to the needs of bilingual clients.
+
+---
+
+## Screenshots
+
+Here are some previews of the key features and interfaces in the project:
+
+### **Screenshot 1: User Interface**
+![User Interface](./screenshots/1.png)
+- The user interface is designed to be clean and user-friendly, ensuring a seamless experience for end-users.
+
+---
+
+### **Screenshot 2: Admin Interface**
+![Admin Interface](./screenshots/2.png)
+- The admin interface provides comprehensive tools for managing data, monitoring performance, and making informed decisions.
+
+---
+
+### **Screenshot 3: Dashboard**
+![Dashboard](./screenshots/3.png)
+- The dashboard offers an interactive and visually appealing way to display key statistics and data.
+
+---
+
 ## Prerequisites
 
 Ensure you have the following installed on your machine:
@@ -14,6 +79,8 @@ Ensure you have the following installed on your machine:
 - **PNPM** (for managing frontend dependencies)
 - **MySQL** or **SQLite** (for the database)
 - **Apache** or **Nginx** (for serving the app, optional if using `artisan serve`)
+
+---
 
 ## Step 1: Clone the Repository
 
@@ -29,7 +96,44 @@ Navigate to the project directory:
 cd reports_php
 ```
 
-## Step 2: Install Project Dependencies
+---
+
+## Step 2: Set Permissions for Storage Directory
+
+Run the following command to set the correct permissions for the `storage` directory:
+
+```bash
+sudo chmod -R 777 /opt/lampp/htdocs/reports_php/storage
+```
+
+---
+
+## Step 3: Update `baseURLAPI` in `config.json`
+
+1. Open the `config.json` file located in the root of the project.
+2. Update the `baseURLAPI` field with your domain API URL. For example:
+
+```json
+{
+  "baseURLAPI": "https://yourdomain.com/api"
+}
+```
+
+3. Save the file.
+
+---
+
+## Step 4: Run the Setup Script
+
+Run the `setup.sh` script to automate the setup process:
+
+```bash
+bash setup.sh
+```
+
+---
+
+## Step 5: Install Project Dependencies
 
 ### Backend Dependencies (Laravel)
 
@@ -56,7 +160,9 @@ cd FrontEndApp
 pnpm install
 ```
 
-## Step 3: Setup Environment Configuration
+---
+
+## Step 6: Setup Environment Configuration
 
 Copy the example environment configuration file:
 
@@ -75,11 +181,14 @@ DB_USERNAME=your_database_username
 DB_PASSWORD=your_database_password
 
 
+MAIL_FROM_ADDRESS=yourmail@example.com
 MAIL_USERNAME=yourmail@example.com
 MAIL_PASSWORD="your password"
 ```
 
-## Step 4: Generate Application Key
+---
+
+## Step 7: Generate Application Key
 
 Generate the application key using the Artisan command. This will set the `APP_KEY` in your `.env` file:
 
@@ -87,7 +196,9 @@ Generate the application key using the Artisan command. This will set the `APP_K
 php artisan key:generate
 ```
 
-## Step 5: Run Migrations
+---
+
+## Step 8: Run Migrations
 
 If your project includes a database, you need to run the migrations to create the necessary database tables:
 
@@ -101,7 +212,9 @@ If there are any seeders to populate the database with sample data, run:
 php artisan db:seed
 ```
 
-## Step 6: Run Frontend Application
+---
+
+## Step 9: Run Frontend Application
 
 To start the frontend application, go back to the **FrontendApp** directory and run the following:
 
@@ -111,7 +224,9 @@ pnpm serve
 
 This will start the development server for the frontend, which can usually be accessed at `http://localhost:3000`.
 
-## Step 7: Serve the Laravel Application
+---
+
+## Step 10: Serve the Laravel Application
 
 You can serve your Laravel application using the built-in development server or via Apache or Nginx.
 
@@ -129,7 +244,9 @@ This will start the development server at `http://localhost:8000`.
 
 If you wish to use Apache or Nginx, configure your virtual host to point to the `public` directory of your Laravel project.
 
-## Step 8: Access the Application
+---
+
+## Step 11: Access the Application
 
 Once both the backend and frontend servers are running, visit the following URL in your browser:
 
@@ -141,6 +258,7 @@ For the frontend:
 
 ```plaintext
 http://localhost:3000
+http://localhost:3000/admin
 ```
 
 If you're using Apache or Nginx, navigate to your domain (`http://yourdomain.local`).
@@ -163,17 +281,7 @@ composer install
 yarn install
 pnpm install
 ```
-
-- **Check server logs for detailed error information:**
-
-```bash
-tail -f storage/logs/laravel.log
-```
-
-## Conclusion
-
-You should now have the Laravel application running locally with **Yarn** for backend dependencies and **PNPM** for the frontend. If you need to deploy it to a production server, consider following Laravel's deployment best practices, including setting up SSL, queue workers, and scheduled tasks.
-
 ---
 
-Feel free to reach out if you have any questions or issues! Happy coding!
+Feel free to reach out if you have any questions or issues! Happy coding! 
+
