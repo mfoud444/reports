@@ -156,7 +156,7 @@ This will install the backend dependencies for Laravel.
 Navigate to the frontend directory and install the frontend dependencies using **PNPM**:
 
 ```bash
-cd FrontEndApp
+cd frontend
 pnpm install
 ```
 
