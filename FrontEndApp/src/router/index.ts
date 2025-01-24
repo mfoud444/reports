@@ -41,7 +41,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/report/index.vue'),
         meta: { requiresAuth: false },
       },
- 
+      {
+        path: '/admin/themes',
+        name: 'themes',
+        component: () => import('@/views/admin/themes1/index.vue'), 
+        meta: { requiresAuth: false },
+      },
 
       // {
       //   path: '/admin/settings',
@@ -57,12 +62,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/translation/index.vue'), 
         meta: { requiresAuth: false },
       },
-      {
-        path: '/admin/themes',
-        name: 'themes',
-        component: () => import('@/views/admin/themes/index.vue'), 
-        meta: { requiresAuth: true },
-      },
+ 
      
    
    

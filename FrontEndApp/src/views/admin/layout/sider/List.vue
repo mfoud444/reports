@@ -32,7 +32,7 @@ const servicesControls = [
   { key: "reporttypes", icon: "mdi:chart-bar", label: "common.report_types" },
   { key: "training-classes", icon: "mdi:school", label: "common.training_classes" },
   { key: "executing-agencies", icon: "mdi:account-group", label: "common.executing_agencies" },
-  { key: "resources", icon: "mdi:resource", label: "common.resources" },
+  { key: "resources", icon: "grommet-icons:resources", label: "common.resources" },
   { key: "performance-indicators", icon: "mdi:chart-line", label: "common.performance_indicators" },
   { key: "maintenance-types", icon: "mdi:wrench", label: "common.maintenance_types" },
   { key: "request-types", icon: "mdi:file-document", label: "common.request_types" },

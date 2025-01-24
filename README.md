@@ -1,3 +1,5 @@
+add sudo chmod -R 777 /opt/lampp/htdocs/reports_php/storage
+
 # Laravel Project Setup and Running Guide
 
 This guide will walk you through the steps required to set up and run a Laravel project on your local machine, using **Yarn** for the Laravel backend and **PNPM** for the frontend.

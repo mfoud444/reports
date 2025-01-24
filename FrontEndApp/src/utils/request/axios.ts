@@ -1,7 +1,8 @@
 import axios, { type AxiosResponse } from 'axios'
 import applyCaseMiddleware from 'axios-case-converter';
-// export const baseURL = "import.meta.env.VITE_GLOB_API_URL"; 
-export const baseURL = "http://localhost/report_php/public/api/"
+import config from '../config.json';
+
+export const baseURL = config.baseURL;
 
 const service = applyCaseMiddleware(axios.create({
   baseURL:baseURL,

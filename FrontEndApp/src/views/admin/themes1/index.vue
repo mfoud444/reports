@@ -1,25 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { 
-  NConfigProvider, 
-  NLayout, 
-  NLayoutHeader, 
-  NLayoutContent, 
-  NLayoutFooter,
-  NCard, 
-  NTabs, 
-  NTabPane, 
-  NH1,
-  NButton,
-  NSelect,
-  useMessage
-} from 'naive-ui'
 import ThemeSection from './ThemeSection.vue'
-
 const message = useMessage()
 const appStore = useAppStore()
-
-// Get the initial theme variables based on the current theme
 let themeVars = appStore.theme === 'dark' ? appStore.darkThemeVars : appStore.normalThemeVars;
 
 const generalVariables = computed(() => ({
@@ -85,54 +68,51 @@ const switchTheme = (value) => {
   selectedTheme.value = value
   appStore.setTheme(value)
   
-  // Update theme variables based on the selected theme
   themeVars = value === 'dark' ? appStore.darkThemeVars : appStore.normalThemeVars
 }
 
 const updateThemeVariable = (key, value) => {
   themeVars[key] = value
-  saveTheme() // Save changes immediately when a variable is updated
+  saveTheme() 
 }
 </script>
 <template>
   <div class="mx-8 my-4">
 
-    <n-config-provider :theme-overrides="themeOverrides">
-  <n-layout>
-    <n-layout-header>
-      <n-h1>{{ t('common.theme_control') }}</n-h1>
-      <n-select 
-        v-model:value="selectedTheme" 
-        :options="themeOptions" 
-        @update:value="switchTheme" 
-        :placeholder="t('common.select_theme')"
-      />
-    </n-layout-header>
-    <n-layout-content>
-      <n-card>
-        <n-tabs type="line" animated>
-          <n-tab-pane name="general" :tab="t('common.general')">
-            <ThemeSection :variables="generalVariables" @update:variable="updateThemeVariable" />
-          </n-tab-pane>
-          <n-tab-pane name="colors" :tab="t('common.colors')">
-            <ThemeSection :variables="colorVariables" @update:variable="updateThemeVariable" />
-          </n-tab-pane>
-          <n-tab-pane name="typography" :tab="t('common.typography')">
-            <ThemeSection :variables="typographyVariables" @update:variable="updateThemeVariable" />
-          </n-tab-pane>
-          <n-tab-pane name="sizes" :tab="t('common.sizes')">
-            <ThemeSection :variables="sizeVariables" @update:variable="updateThemeVariable" />
-          </n-tab-pane>
-          <n-tab-pane name="effects" :tab="t('common.effects')">
-            <ThemeSection :variables="effectVariables" @update:variable="updateThemeVariable" />
-          </n-tab-pane>
-        </n-tabs>
-      </n-card>
-    </n-layout-content>
-    <n-layout-footer>
-      <!-- Removed save button since the theme saves automatically -->
-    </n-layout-footer>
-  </n-layout>
-</n-config-provider>
+
+  <n-config-provider :theme-overrides="themeOverrides">
+    <n-layout>
+      <n-layout-header>
+        <n-h1>Theme Control</n-h1>
+        <n-select 
+          v-model:value="selectedTheme" 
+          :options="themeOptions" 
+          @update:value="switchTheme" 
+          placeholder="Select Theme"
+        />
+      </n-layout-header>
+      <n-layout-content>
+        <n-card>
+          <n-tabs type="line" animated>
+            <n-tab-pane name="general" tab="General">
+              <ThemeSection :variables="generalVariables" @update:variable="updateThemeVariable" />
+            </n-tab-pane>
+            <n-tab-pane name="colors" tab="Colors">
+              <ThemeSection :variables="colorVariables" @update:variable="updateThemeVariable" />
+            </n-tab-pane>
+            <n-tab-pane name="typography" tab="Typography">
+              <ThemeSection :variables="typographyVariables" @update:variable="updateThemeVariable" />
+            </n-tab-pane>
+            <n-tab-pane name="sizes" tab="Sizes">
+              <ThemeSection :variables="sizeVariables" @update:variable="updateThemeVariable" />
+            </n-tab-pane>
+            <n-tab-pane name="effects" tab="Effects">
+              <ThemeSection :variables="effectVariables" @update:variable="updateThemeVariable" />
+            </n-tab-pane>
+          </n-tabs>
+        </n-card>
+      </n-layout-content>
+    </n-layout>
+  </n-config-provider>
 </div>
 </template>
