@@ -84,7 +84,7 @@ RUN cd frontend && pnpm install && cd ..
 # 
 # RUN yarn front:build
 # Build frontend assets
-RUN yarn deploy
-RUN php artisan migrate:seed
+# RUN yarn deploy
+# RUN php artisan migrate:seed
 # Start MariaDB and Apache in the foreground
 CMD service mariadb start && /usr/local/bin/wait-for-mysql.sh && apache2-foreground
