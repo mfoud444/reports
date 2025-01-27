@@ -1,4 +1,4 @@
-# Use the official PHP 8.0 Apache image as the base image
+# Use the official PHP 8.2 Apache image as the base image
 FROM php:8.2-apache
 
 # Set working directory
@@ -81,7 +81,7 @@ RUN chmod +x /usr/local/bin/wait-for-mysql.sh
 RUN cd frontend && pnpm install && cd ..
 
 # Run database migrations and seed
-RUN php artisan migrate --seed
+RUN php artisan migrate:seed
 
 # Build frontend assets
 RUN yarn deploy
