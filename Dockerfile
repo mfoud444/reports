@@ -33,7 +33,7 @@ RUN ls -la /var/www/html/composer.json
 RUN echo 'memory_limit = -1' > /usr/local/etc/php/conf.d/memory-limit.ini
 
 # Install Composer dependencies
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-scripts
 
 # Debug: Verify vendor directory exists
 RUN ls -la /var/www/html/vendor
