@@ -30,7 +30,7 @@ RUN ls -la
 RUN cp .env.example .env
 
 # Install Composer dependencies
-RUN composer install
+# RUN composer install
 
 # Generate application key
 RUN php artisan key:generate
