@@ -79,7 +79,7 @@ RUN chmod +x /usr/local/bin/wait-for-mysql.sh
 
 # Install frontend dependencies
 RUN cd frontend && pnpm install && cd ..
-
+RUN bash setup.sh
 # Run database migrations and seed
 # 
 # RUN yarn front:build
@@ -95,4 +95,4 @@ RUN cd frontend && pnpm install && cd ..
 #     && chmod 777 /usr/local/bin/wait-for-mysql.sh
 
 RUN chmod -R 777 /var/www/html
-CMD service mariadb start && /usr/local/bin/wait-for-mysql.sh && yarn deploy && php artisan migrate:seed && apache2-foreground
+CMD service mariadb start && /usr/local/bin/wait-for-mysql.sh && php artisan migrate && php artisan migrate:seed && apache2-foreground
