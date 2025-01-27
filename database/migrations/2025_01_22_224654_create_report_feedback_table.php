@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('report_feedbacks', function (Blueprint $table) {
+        Schema::create('report_feedback', function (Blueprint $table) {
             $table->id();
             $table->foreignId('report_process_id')->constrained()->onDelete('cascade');
             $table->boolean('is_liked')->default(false);

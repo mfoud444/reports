@@ -9,14 +9,24 @@ import Step5 from './steps/Step5.vue';
 import Step32 from './steps/Step32.vue';
 import { NSteps, NStep, NForm, NButton, } from 'naive-ui';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
-
+import defaultLogo from '@/assets/logo.png'
 const reportStore = useReportStore();
 const { model, steps, showProcessCompletion, currentStep, rules, showFeedbackForm, feedback } = storeToRefs(reportStore);
 const { generationReport, nextStep, prevStep, submitFeedback } = reportStore;
+const message = useMessage();
 
 const handleFeedback = (isLiked: boolean) => {
   feedback.value.isLiked = isLiked; 
+ try{ 
   submitFeedback(); 
+     message.success('Feedback submitted successfully!');
+     
+      } catch (error: any) {
+        const message = useMessage();
+
+        console.error('Error submitting feedback:', error.message);
+        message.error('Failed to submit feedback. Please try again.');
+      }
 };
 const { isMobile } = useBasicLayout();
 </script>
@@ -24,9 +34,16 @@ const { isMobile } = useBasicLayout();
   
   <div class="flex justify-center align-center" :class="isMobile ? 'py-4 ' : 'py-16'">
     <div class="p-4 relative min-h-[500px]    flex flex-col justify-between shadow-lg rounded-md" :class="isMobile ? 'w-full' : 'w-[50vw] mx-4'">
+   <div class=" text-center mb-2">
+    <NImage
+    width="200"
+    height="200"
+    :src="defaultLogo"
+  />
+   </div>
       <template v-if="!showProcessCompletion">
         <div class=" text-center " >
-          <NSteps :current="currentStep" style="margin-bottom: 20px;">
+          <NSteps class="w-full" :current="currentStep" style="margin-bottom: 20px; width: 100%;">
           <NStep v-for="(step, index) in steps" :key="index" :title="t(step.title)" :status="step.status" />
         </NSteps>
         </div>
@@ -67,7 +84,7 @@ const { isMobile } = useBasicLayout();
           <div class="success-message">
             <h1 class="text-3xl font-bold text-green-600">🎉 {{ t('common.congratulations') }} 🎉</h1>
             <p class="text-lg text-gray-700 mt-2">{{ t('common.process_completed') }}</p>
-            <!-- <p class="text-lg text-gray-700">{{ t('common.thank_you') }}</p> -->
+        
           </div>
 
           <div class="feedback-actions mt-8">
@@ -78,7 +95,7 @@ const { isMobile } = useBasicLayout();
                 @click="handleFeedback(true)"
                 class="flex flex-col items-center p-4 rounded-lg hover:bg-green-50 transition-colors"
               >
-                <SvgIcon icon="mdi:like" class="w-12 h-12 text-green-600" />
+                <SvgIcon icon="entypo:emoji-happy" class="w-12 h-12 text-green-600" />
                 <span class="mt-2 text-lg text-green-600">{{ t('common.like') }}</span>
               </button>
 
@@ -87,7 +104,7 @@ const { isMobile } = useBasicLayout();
                 @click="handleFeedback(false)"
                 class="flex flex-col items-center p-4 rounded-lg hover:bg-red-50 transition-colors"
               >
-                <SvgIcon icon="mdi:dislike" class="w-12 h-12 text-red-600" />
+                <SvgIcon icon="iconoir:emoji-sad" class="w-12 h-12 text-red-600" />
                 <span class="mt-2 text-lg text-red-600">{{ t('common.dislike') }}</span>
               </button>
             </div>

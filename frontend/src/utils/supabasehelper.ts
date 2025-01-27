@@ -8,7 +8,7 @@ export const fetchDataFromTable = async <T>(
   filters?: { [key: string]: any } 
 ): Promise<{ data: T[]; totalCount: number }> => {
   try {
-    console.log("url",tableName )
+
     let query = await get<T>({
         url: tableName,
        method : 'GET'

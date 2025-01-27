@@ -4,7 +4,7 @@ import axios from 'axios';
 import { baseURL } from '@/utils/request/axios';
 import { ref } from 'vue';
 import { initializeModel } from '@/utils/modelUtils';
-
+import {  useMessage } from 'naive-ui';
 export const useReportStore = defineStore('report', {
   state: () => ({
     model: ref<API.ReportModel>(initializeModel()),
@@ -76,83 +76,75 @@ export const useReportStore = defineStore('report', {
         ];
       }
     },
+
+    // content-disposition:
+    // attachment; filename=report_22.pdf
+    
+    // but not found match[1]
+    // » "kkkkkkkkk" "report.pdf"
     async generationReport() {
       try {
-        console.log("data",this.model)
-       
-    // Create FormData object
-    const formData = new FormData();
-
-    // Append all fields from the model to FormData
-    Object.keys(this.model).forEach((key) => {
-      const value = this.model[key];
-
-      // Check if the value is a file object (from NUpload)
-      if (value && typeof value === 'object' && value.file) {
-        // Append the file
-        formData.append(key, value.file);
-      } else {
-        // Append other fields as strings
-        formData.append(key, value);
-      }
-    });
-
-    // Send the FormData to the backend
-    const response = await axios.post(`${baseURL}generatereport`, formData, {
-      responseType: 'blob',
-      headers: {
-        'Content-Type': 'multipart/form-data', 
-      },
-    });
-
-        const blob = new Blob([response.data]);
-        const blobUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = blobUrl;
-
-        const contentDisposition = response.headers['content-disposition'];
-        let filename = 'report.pdf';
-        if (contentDisposition && contentDisposition.includes('filename=')) {
-          filename = contentDisposition
-            .split('filename=')[1]
-            .split(';')[0]
-            .replace(/['"]/g, '');
+        console.log("data", this.model);
+    
+        const formData = new FormData();
+        Object.keys(this.model).forEach((key) => {
+          const value = this.model[key];
+          if (value && typeof value === 'object' && value.file) {
+            formData.append(key, value.file);
+          } else {
+            formData.append(key, value);
+          }
+        });
+    
+        // Send the request to the backend
+        const response = await axios.post(`${baseURL}generatereport`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+    
+        // Extract data from the response
+        const { reportProcessId, file } = response.data;
+    
+        if (reportProcessId) {
+          this.reportProcessId = reportProcessId;
+          console.log("Report Process ID:", reportProcessId);
+        } else {
+          console.warn("Response does not contain reportProcessId.");
         }
-
-        // Extract the report_process_id from the filename
-        const match = filename.match(/report_(\d+)\.pdf/);
-        if (match) {
-          this.reportProcessId = match[1]; // Store the report_process_id
+    
+        if (file) {
+          // Decode the base64 file and create a blob
+          const blob = new Blob([Uint8Array.from(atob(file), (c) => c.charCodeAt(0))], {
+            type: 'application/pdf',
+          });
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = `report_${reportProcessId || 'unknown'}.pdf`; // Use default if reportProcessId is missing
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(blobUrl);
         }
-
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(blobUrl);
-
+    
         // Show feedback form after download
         this.showFeedbackForm = true;
         this.showProcessCompletion = true;
-
-        // Show success message
-        // message.success('Report generated successfully!');
-      } catch (error: any) {
+    
+      } catch (error:any) {
         console.error('Error generating report:', error.message);
-        console.error('Error :', error.error);
-        if (error.response && error.response.data instanceof Blob) {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const errorMessage = JSON.parse(reader.result as string).message;
-            console.error('Error generating report:', errorMessage);
-            // message.error(`Error: ${errorMessage}`);
-          };
-          reader.readAsText(error.response.data);
-        } else {
-          // message.error('Failed to generate report. Please try again.');
+        if (error.response && error.response.data) {
+          try {
+            const errorMessage = JSON.parse(error.response.data).message;
+            console.error('Error:', errorMessage);
+          } catch {
+            console.error('Error details:', error);
+          }
         }
       }
     },
+    
 
     async submitFeedback() {
       try {
@@ -164,13 +156,14 @@ export const useReportStore = defineStore('report', {
           is_liked: this.feedback.isLiked,
          
         });
-
-        // Show success message
-        // message.success('Feedback submitted successfully!');
+    
         this.showFeedbackForm = false; // Hide feedback form after submission
+        this.showProcessCompletion = false;
       } catch (error: any) {
+     
+
         console.error('Error submitting feedback:', error.message);
-        // message.error('Failed to submit feedback. Please try again.');
+       
       }
     },
     nextStep() {

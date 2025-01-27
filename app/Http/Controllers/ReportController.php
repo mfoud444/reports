@@ -1,5 +1,5 @@
 <?php
-  
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -8,7 +8,8 @@ use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
-use App\Models\ReportProcess;
+use App\Models\ReportProcess;;
+use Dompdf\Options;
 
 class ReportController extends Controller
 {
@@ -19,7 +20,7 @@ class ReportController extends Controller
             $reportType = $request->input('reportType', 'achievement');
             $region = $request->input('region', 'الباحة');
             $documentationFiles = [];
-            $tempFiles = []; 
+            $tempFiles = [];
             for ($i = 1; $i <= 4; $i++) {
                 $docKey = 'documentation' . $i;
                 if ($request->hasFile($docKey)) {
@@ -27,7 +28,7 @@ class ReportController extends Controller
                     $tempFilePath = storage_path('temp/' . Str::uuid() . '.' . $file->getClientOriginalExtension());
                     $file->move(storage_path('temp'), basename($tempFilePath));
                     $documentationFiles[$docKey] = $tempFilePath;
-                    $tempFiles[] = $tempFilePath; 
+                    $tempFiles[] = $tempFilePath;
                 }
             }
 
@@ -37,7 +38,7 @@ class ReportController extends Controller
                 $tempFilePath = storage_path('temp/' . Str::uuid() . '.' . $file->getClientOriginalExtension());
                 $file->move(storage_path('temp'), basename($tempFilePath));
                 $stampFile = $tempFilePath;
-                $tempFiles[] = $tempFilePath; 
+                $tempFiles[] = $tempFilePath;
             }
             $templatePath = storage_path("templates/{$reportType}_report.docx");
             $templateProcessor = new TemplateProcessor($templatePath);
@@ -118,6 +119,11 @@ class ReportController extends Controller
                 'totalExpenses' => $data['totalExpenses'] ?? '0.00',
                 'totalRemaining' => $data['totalRemaining'] ?? '0.00',
                 'totalPercentage' => $data['totalPercentage'] ?? '0.00%',
+                'documentation1'  => '',
+                'documentation2'  => '',
+                'documentation3'  => '',
+                'documentation4'  => '',
+                'stamp'  => '',
             ];
 
             for ($i = 1; $i <= 4; $i++) {
@@ -135,29 +141,41 @@ class ReportController extends Controller
             $tempDocxPath = storage_path('temp/' . Str::uuid() . '.docx');
             $templateProcessor->saveAs($tempDocxPath);
 
-            $pdfPath = $this->convertDocxToPdf($tempDocxPath);
+            $pdfPath = $this->convertDocxToPdfUsingAPI($tempDocxPath);
 
-                // Save the report generation process in the database
-        $reportProcess =  ReportProcess::create([
-            'report_type_id' => $this->getReportTypeId($reportType), 
-            'generated_at' => now(),
-        ]);
+            
+            $reportProcess =  ReportProcess::create([
+                'report_type_id' => $this->getReportTypeId($reportType),
+                'generated_at' => now(),
+            ]);
 
             foreach ($tempFiles as $file) {
                 if (file_exists($file)) {
-                    unlink($file); 
+                    unlink($file);
                 }
             }
 
-           // Return the generated PDF as a download response with the report_process_id
-        return response()->download($pdfPath, "report_{$reportProcess->id}.pdf")->deleteFileAfterSend(true);
+            // Read the PDF content
+            $pdfContent = file_get_contents($pdfPath);
 
+            // Encode the file as Base64 to include it in the response
+            $responseData = [
+                'reportProcessId' => $reportProcess->id,
+                'file' => base64_encode($pdfContent),
+            ];
+
+            // Delete the file after preparing the response
+            if (file_exists($pdfPath)) {
+                unlink($pdfPath);
+            }
+
+            return response()->json($responseData);
         } catch (\Exception $e) {
-      
+
             Log::error('Error generating report:', ['error' => $e->getMessage()]);
             foreach ($tempFiles as $file) {
                 if (file_exists($file)) {
-                    unlink($file); 
+                    unlink($file);
                 }
             }
 
@@ -169,13 +187,14 @@ class ReportController extends Controller
         }
     }
 
+
     private function translateReportType($reportType)
     {
-       
+
         $translations = [
             'achievement' => 'تقرير الإنجاز',
             'maintenance' => 'تقرير الصيانة',
-            'financial'=> 'تقرير مالي',
+            'financial' => 'تقرير مالي',
         ];
         return $translations[$reportType] ?? $reportType;
     }
@@ -192,139 +211,164 @@ class ReportController extends Controller
         return $reportTypeModel ? $reportTypeModel->id : null;
     }
 
-    private function convertDocxToPdf($docxPath)
-    {
-        try {
-          
-            $phpWord = \PhpOffice\PhpWord\IOFactory::load($docxPath);
-            $tempHtmlPath = storage_path('temp/' . Str::uuid() . '.html');
-            $htmlWriter = new \PhpOffice\PhpWord\Writer\HTML($phpWord);
-            $htmlWriter->save($tempHtmlPath);
-    
-            $htmlContent = file_get_contents($tempHtmlPath);
-            $htmlContent = '<!DOCTYPE html>
-            <html dir="rtl" lang="ar">
-            <head>
-                <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-                <style>
-                    @font-face {
-                        font-family: "Sakkal Majalla";
-                        font-style: normal;
-                        font-weight: normal;
-                        src: url(' . storage_path('fonts/majalla.ttf') . ');
-                    }
-                    body {
-                        font-family: "Sakkal Majalla", sans-serif;
-                        text-align: right; /* Ensure text is aligned to the right */
-                    }
-                </style>
-            </head>
-            <body>
-            ' . $htmlContent . '
-            </body>
-            </html>';
-    
-            $dompdf = new Dompdf();
-    
-            $dompdf->loadHtml($htmlContent, 'UTF-8');
-    
-            $dompdf->setPaper('A4', 'portrait');
-    
-            $dompdf->render();
 
-            $pdfPath = storage_path('temp/' . Str::uuid() . '.pdf');
-            file_put_contents($pdfPath, $dompdf->output());
+   
     
-            if (file_exists($tempHtmlPath)) {
-                unlink($tempHtmlPath);
-            }
-    
-            return $pdfPath;
-    
-        } catch (\Exception $e) {
-          
-            Log::error('Error converting DOCX to PDF:', ['error' => $e->getMessage()]);
-            if (isset($tempHtmlPath) && file_exists($tempHtmlPath)) {
-                unlink($tempHtmlPath);
-            }
-    
-            throw new \Exception("Failed to convert DOCX to PDF: " . $e->getMessage());
+ 
+private function convertDocxToPdf($docxPath)
+{
+    try {
+        // Load the DOCX file
+        $phpWord = \PhpOffice\PhpWord\IOFactory::load($docxPath);
+
+        // Save as HTML
+        $tempHtmlPath = storage_path('temp/' . Str::uuid() . '.html');
+        $htmlWriter = new \PhpOffice\PhpWord\Writer\HTML($phpWord);
+        $htmlWriter->save($tempHtmlPath);
+
+        // Read the generated HTML content
+        $htmlContent = file_get_contents($tempHtmlPath);
+
+        // Get the path to the custom font
+        $fontDir = storage_path('fonts/');
+        $fontPath = $fontDir . 'majalla.ttf';
+
+        // Ensure the font exists
+        if (!file_exists($fontPath)) {
+            throw new \Exception("Font file not found at: " . $fontPath);
         }
+
+        // Configure Dompdf options
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+        $options->setDefaultFont('majalla'); // Set the custom font as default
+        $options->setFontDir($fontDir);      // Set the font directory
+        $options->setFontCache($fontDir);   // Use the same directory for caching
+
+        // Initialize Dompdf
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($htmlContent, 'UTF-8');
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render the PDF
+        $dompdf->render();
+
+        // Save the PDF to a temporary file
+        $pdfPath = storage_path('temp/' . Str::uuid() . '.pdf');
+        file_put_contents($pdfPath, $dompdf->output());
+
+        // Clean up temporary HTML file
+        if (file_exists($tempHtmlPath)) {
+            unlink($tempHtmlPath);
+        }
+
+        return $pdfPath;
+    } catch (\Exception $e) {
+        // Log errors
+        Log::error('Error converting DOCX to PDF:', ['error' => $e->getMessage()]);
+
+        // Clean up temporary HTML file if it exists
+        if (isset($tempHtmlPath) && file_exists($tempHtmlPath)) {
+            unlink($tempHtmlPath);
+        }
+
+        throw new \Exception("Failed to convert DOCX to PDF: " . $e->getMessage());
     }
+}
+    
 
+private function convertDocxToPdfUsingAPI($docxPath)
+{
+    try {
+        // Read the DOCX file
+        $fileContents = file_get_contents($docxPath);
+        $fileName = basename($docxPath);
 
-       /**
+        // Call the Flask API
+        $response = Http::attach(
+            'file', // The name of the field the API expects
+            $fileContents,
+            $fileName
+        )->post('https://converted-api.onrender.com/convert'); // Replace with the actual Flask API URL
+
+        // Check the response status
+        if ($response->failed()) {
+            Log::error('Failed to call Flask API', ['response' => $response->body()]);
+            throw new \Exception('Failed to convert DOCX to PDF: API error.');
+        }
+
+        // Save the PDF content
+        $pdfContent = $response->body();
+        $pdfPath = storage_path('temp/' . Str::uuid() . '.pdf');
+        file_put_contents($pdfPath, $pdfContent);
+
+        return $pdfPath;
+    } catch (\Exception $e) {
+        Log::error('Error converting DOCX to PDF using Flask API:', ['error' => $e->getMessage()]);
+        throw new \Exception('Failed to convert DOCX to PDF: ' . $e->getMessage());
+    }
+}
+
+  
+    /**
      * Convert DOCX to PDF using Pandoc's online API.
      *
      * @param string $docxPath Path to the DOCX file.
      * @return string Path to the generated PDF file.
      * @throws \Exception If the conversion fails.
      */
-   /**
- * Convert DOCX to PDF using Pandoc's online API.
- *
- * @param string $docxPath Path to the DOCX file.
- * @return string Path to the generated PDF file.
- * @throws \Exception If the conversion fails.
- */
-private function convertDocxToPdfUsingPandoc($docxPath)
-{
-    try {
-        // Read the DOCX file and encode it as base64
-        $docxContent = file_get_contents($docxPath);
-        $base64Content = base64_encode($docxContent);
+    private function convertDocxToPdfUsingPandoc($docxPath)
+    {
+        try {
+            // Read the DOCX file and encode it as base64
+            $docxContent = file_get_contents($docxPath);
+            $base64Content = base64_encode($docxContent);
 
-        // Prepare the request payload
-        $payload = [
-            'citeproc' => false,
-            'embed-resources' => false,
-            'files' => (object)[], // Empty object
-            'from' => 'docx',
-            'highlight-style' => null,
-            'html-math-method' => 'plain',
-            'number-sections' => false,
-            'standalone' => false,
-            'table-of-contents' => false,
-            'template' => null,
-            'text' => $base64Content, // Base64-encoded DOCX content
-            'to' => 'pptx', // Convert to PDF
-            'wrap' => 'auto',
-        ];
+            // Prepare the request payload
+            $payload = [
+                'citeproc' => false,
+                'embed-resources' => false,
+                'files' => (object)[], // Empty object
+                'from' => 'docx',
+                'highlight-style' => null,
+                'html-math-method' => 'plain',
+                'number-sections' => false,
+                'standalone' => false,
+                'table-of-contents' => false,
+                'template' => null,
+                'text' => $base64Content, // Base64-encoded DOCX content
+                'to' => 'pptx', // Convert to PDF
+                'wrap' => 'auto',
+            ];
 
-        // Send the request to Pandoc's API
-        $response = Http::withHeaders([
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-        ])->post('https://pandoc.org/cgi-bin/pandoc-server.cgi', $payload);
+            // Send the request to Pandoc's API
+            $response = Http::withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ])->post('https://pandoc.org/cgi-bin/pandoc-server.cgi', $payload);
 
-        // Check if the request was successful
-        if (!$response->successful()) {
-            throw new \Exception('Failed to convert DOCX to PDF: ' . $response->body());
+            // Check if the request was successful
+            if (!$response->successful()) {
+                throw new \Exception('Failed to convert DOCX to PDF: ' . $response->body());
+            }
+
+            // Decode the base64 response
+            $responseData = $response->json();
+            if (empty($responseData['output']) || !$responseData['base64']) {
+                throw new \Exception('Invalid response from Pandoc API');
+            }
+
+            $pdfContent = base64_decode($responseData['output']);
+
+            // Save the PDF file
+            $pdfPath = storage_path('temp/' . Str::uuid() . '.pdf');
+            file_put_contents($pdfPath, $pdfContent);
+
+            return $pdfPath;
+        } catch (\Exception $e) {
+            Log::error('Error converting DOCX to PDF using Pandoc:', ['error' => $e->getMessage()]);
+            throw new \Exception('Failed to convert DOCX to PDF: ' . $e->getMessage());
         }
-
-        // Decode the base64 response
-        $responseData = $response->json();
-        if (empty($responseData['output']) || !$responseData['base64']) {
-            throw new \Exception('Invalid response from Pandoc API');
-        }
-
-        $pdfContent = base64_decode($responseData['output']);
-
-        // Save the PDF file
-        $pdfPath = storage_path('temp/' . Str::uuid() . '.pdf');
-        file_put_contents($pdfPath, $pdfContent);
-
-        return $pdfPath;
-
-    } catch (\Exception $e) {
-        Log::error('Error converting DOCX to PDF using Pandoc:', ['error' => $e->getMessage()]);
-        throw new \Exception('Failed to convert DOCX to PDF: ' . $e->getMessage());
     }
-}
-
-    
-
-
-
- 
 }

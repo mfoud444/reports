@@ -126,18 +126,18 @@ const menuOptions: MenuOption[] = [
       })),
     ],
   },
-  {
-    type: 'group',
-    label: t('common.settings'),
-    key: 'settings',
-    children: [
-      {
-        label: t('common.themes'),
-        key: 'themes',
-        icon: iconRender({ icon: 'mdi:palette' }),
-      },
-    ],
-  },
+  // {
+  //   type: 'group',
+  //   label: t('common.settings'),
+  //   key: 'settings',
+  //   children: [
+  //     {
+  //       label: t('common.themes'),
+  //       key: 'themes',
+  //       icon: iconRender({ icon: 'mdi:palette' }),
+  //     },
+  //   ],
+  // },
 ];
 
 const inverted = ref(false);

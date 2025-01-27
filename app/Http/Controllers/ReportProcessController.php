@@ -6,6 +6,8 @@ use App\Models\ReportFeedback;
 use App\Models\ReportProcess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 
 class ReportProcessController extends Controller
 {
@@ -149,4 +151,41 @@ public function countByType(Request $request)
 
     return response()->json(['count' => $count]);
 }
+
+
+
+public function saveFeedback(Request $request, $reportProcessId)
+{
+    try {
+        // Validate the request
+        $validated = $request->validate([
+            'is_liked' => 'required|boolean',
+        ]);
+
+        // Find the report process
+        $reportProcess = ReportProcess::findOrFail($reportProcessId);
+
+        // Save feedback
+        $reportProcess->feedback()->create([
+            'is_liked' => $validated['is_liked'],
+          
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Feedback saved successfully.',
+        ]);
+
+    } catch (\Exception $e) {
+        // Log the error
+        Log::error('Error saving feedback:', ['error' => $e->getMessage()]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred while saving feedback.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
 }

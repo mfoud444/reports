@@ -60,40 +60,6 @@ class ReportFeedbackController extends Controller
     /**
  * Save feedback for a specific report process.
  */
-public function saveFeedback(Request $request, $reportProcessId)
-{
-    try {
-        // Validate the request
-        $validated = $request->validate([
-            'is_liked' => 'required|boolean',
-        ]);
-
-        // Find the report process
-        $reportProcess = ReportProcess::findOrFail($reportProcessId);
-
-        // Save feedback
-        $reportProcess->feedback()->create([
-            'is_liked' => $validated['is_liked'],
-          
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Feedback saved successfully.',
-        ]);
-
-    } catch (\Exception $e) {
-        // Log the error
-        Log::error('Error saving feedback:', ['error' => $e->getMessage()]);
-
-        return response()->json([
-            'success' => false,
-            'message' => 'An error occurred while saving feedback.',
-            'error' => $e->getMessage(),
-        ], 500);
-    }
-}
-
 
 public function count(Request $request)
 {

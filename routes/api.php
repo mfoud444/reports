@@ -45,4 +45,6 @@ Route::apiResource('report-feedbacks', ReportFeedbackController::class);
 
 Route::get('report-types/{id}/statistics', [ReportTypeController::class, 'statistics']);
 
-Route::post('/report-processes/{reportProcessId}/feedback', [ReportController::class, 'saveFeedback']);
+Route::post('/report-processes/{reportProcessId}/feedback', [ReportProcessController::class, 'saveFeedback']);
+
+
