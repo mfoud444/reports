@@ -24,13 +24,19 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && npm install -g yarn pnpm
 
 # Copy your application files
-COPY . .
-RUN ls -la
-# Copy .env.example to .env
-RUN cp .env.example .env
+COPY --chown=www-data:www-data . .
+
+# Debug: Verify composer.json exists
+RUN ls -la /var/www/html/composer.json
 
 # Install Composer dependencies
-# RUN composer install
+RUN composer install --no-dev --optimize-autoloader -d memory_limit=-1
+
+# Debug: Verify vendor directory exists
+RUN ls -la /var/www/html/vendor
+
+# Copy .env.example to .env
+RUN cp .env.example .env
 
 # Generate application key
 RUN php artisan key:generate
