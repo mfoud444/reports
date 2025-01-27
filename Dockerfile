@@ -29,8 +29,11 @@ COPY --chown=www-data:www-data . .
 # Debug: Verify composer.json exists
 RUN ls -la /var/www/html/composer.json
 
+# Set PHP memory limit for Composer
+RUN echo 'memory_limit = -1' > /usr/local/etc/php/conf.d/memory-limit.ini
+
 # Install Composer dependencies
-RUN composer install --no-dev --optimize-autoloader -d memory_limit=-1
+RUN composer install --no-dev --optimize-autoloader
 
 # Debug: Verify vendor directory exists
 RUN ls -la /var/www/html/vendor
