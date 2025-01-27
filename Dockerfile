@@ -1,5 +1,5 @@
 # Use the official PHP 8.0 Apache image as the base image
-FROM php:8.1-apache
+FROM php:8.2-apache
 
 # Set working directory
 WORKDIR /var/www/html
@@ -33,7 +33,7 @@ RUN ls -la /var/www/html/composer.json
 RUN echo 'memory_limit = -1' > /usr/local/etc/php/conf.d/memory-limit.ini
 
 # Install Composer dependencies
-RUN composer install --no-scripts
+RUN composer install 
 
 # Debug: Verify vendor directory exists
 RUN ls -la /var/www/html/vendor
