@@ -10,7 +10,7 @@
         "production": "mix --production",
 
         "front:serve": "cd frontend && pnpm dev",
-        "front:build": "cd frondend && pnpm build",
+        "front:build": "cd frontend && pnpm build",
         "serve": "concurrently \"php artisan serve --port=8080\" \"yarn front:serve\"",
         "deploy": "yarn  front:build && php artisan migrate"
     },
