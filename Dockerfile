@@ -95,4 +95,4 @@ RUN bash setup.sh
 #     && chmod 777 /usr/local/bin/wait-for-mysql.sh
 
 RUN chmod -R 777 /var/www/html
-CMD service mariadb start && /usr/local/bin/wait-for-mysql.sh && php artisan migrate && php artisan migrate:seed && apache2-foreground
+CMD service mariadb start && /usr/local/bin/wait-for-mysql.sh && apache2-foreground
