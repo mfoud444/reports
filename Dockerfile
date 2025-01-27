@@ -78,7 +78,7 @@ COPY wait-for-mysql.sh /usr/local/bin/wait-for-mysql.sh
 RUN chmod +x /usr/local/bin/wait-for-mysql.sh
 
 # Install frontend dependencies
-# RUN cd frontend && pnpm install && cd ..
+RUN cd frontend && pnpm install && cd ..
 
 # Run database migrations and seed
 # 
