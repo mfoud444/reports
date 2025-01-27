@@ -81,7 +81,7 @@ RUN chmod +x /usr/local/bin/wait-for-mysql.sh
 RUN cd frontend && pnpm install && cd ..
 
 # Run database migrations and seed
-RUN php artisan migrate:seed
+# RUN php artisan migrate:seed
 
 # Build frontend assets
 RUN yarn deploy
