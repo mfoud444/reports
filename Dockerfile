@@ -1,70 +1,70 @@
-# Stage 1: Build the frontend (Vue.js with pnpm)
-FROM node:20 as frontend-builder
+FROM php:8.0-apache
 
-# Set working directory for frontend
-WORKDIR /app/frontend
+# Set working directory
+WORKDIR /var/www/html
 
-# Copy package.json and pnpm-lock.yaml
-COPY frontend/package.json frontend/pnpm-lock.yaml ./
+# Copy your application files
+COPY . .
 
+# Set environment variables
+ENV PORT=8000
+ENV DB_PORT=8001
+EXPOSE ${PORT} ${DB_PORT}
+
+# Change Apache listening port
+RUN sed -i "s/Listen 80/Listen ${PORT}/" /etc/apache2/ports.conf
+
+# Install MySQLi extension
+RUN docker-php-ext-install mysqli
+
+# Suppress deprecation warnings
+RUN echo "error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT" > /usr/local/etc/php/conf.d/error-reporting.ini
+
+# Install necessary dependencies
+RUN apt-get update && apt-get install -y \
+    default-mysql-client \
+    wget \
+    unzip \
+    && docker-php-ext-install mysqli pdo pdo_mysql
+
+# Download and install phpMyAdmin
+RUN wget https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.zip -O /tmp/phpmyadmin.zip \
+    && unzip /tmp/phpmyadmin.zip -d /var/www/html/ \
+    && mv /var/www/html/phpMyAdmin-* /var/www/html/phpmyadmin \
+    && rm /tmp/phpmyadmin.zip
+
+# Copy configuration file for phpMyAdmin
+COPY config.inc.php /var/www/html/phpmyadmin/
+
+# Copy the SQL file into the container
+COPY moh.sql /tmp/moh.sql
+
+# Install and configure MariaDB server
+RUN apt-get update && apt-get install -y mariadb-server \
+    && sed -i "s/^\(bind-address\s*=\s*\).*\$/\10.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf \
+    && sed -i "s/^\(port\s*=\s*\).*\$/\1${DB_PORT}/" /etc/mysql/mariadb.conf.d/50-server.cnf \
+    && service mariadb start \
+    && mysql -e "CREATE DATABASE rep;" \
+    && mysql -e "CREATE USER 'bootmy'@'%' IDENTIFIED BY 'pmapass';" \
+    && mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'bootmy'@'%';" \
+    && mysql -e "FLUSH PRIVILEGES;" 
+# Copy the wait-for-mysql script
+COPY wait-for-mysql.sh /usr/local/bin/wait-for-mysql.sh
+RUN chmod +x /usr/local/bin/wait-for-mysql.sh
+
+RUN npm install -g yarn
+RUN yarn install
+
+RUN cd frontend
 # Install pnpm globally
 RUN npm install -g pnpm
 
 # Install frontend dependencies
 RUN pnpm install
 
-# Copy the rest of the frontend files
-COPY frontend .
+RUN cd ..
+RUN php artisan db:seed
+RUN yarn deploy
 
-# Build the frontend
-RUN pnpm run build
-
-# Stage 2: Build the backend (Laravel)
-FROM composer:2 as backend-builder
-
-# Set working directory for backend
-WORKDIR /app/backend
-
-# Copy Laravel files
-COPY backend .
-
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
-
-# Stage 3: Final production image
-FROM php:8.2-fpm-alpine
-
-# Set working directory
-WORKDIR /var/www/html
-
-# Install system dependencies
-RUN apk add --no-cache \
-    nginx \
-    supervisor \
-    libzip-dev \
-    zip \
-    unzip \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd pdo_mysql zip pcntl
-
-# Copy Nginx and Supervisor configuration files
-COPY docker/nginx.conf /etc/nginx/nginx.conf
-COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-# Copy backend files from backend-builder stage
-COPY --from=backend-builder /app/backend .
-
-# Copy frontend build files from frontend-builder stage
-COPY --from=frontend-builder /app/frontend/dist ./public
-
-# Set permissions for Laravel storage and bootstrap/cache
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Expose ports
-EXPOSE 80
-
-# Start Nginx and PHP-FPM using Supervisor
-CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Start MariaDB and Apache in the foreground
+CMD service mariadb start && /usr/local/bin/wait-for-mysql.sh && apache2-foreground
