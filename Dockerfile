@@ -1,7 +1,13 @@
+# Use the official PHP 8.0 Apache image as the base image
 FROM php:8.0-apache
 
 # Set working directory
 WORKDIR /var/www/html
+
+# Install Node.js 20
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g yarn pnpm
 
 # Copy your application files
 COPY . .
@@ -14,8 +20,8 @@ EXPOSE ${PORT} ${DB_PORT}
 # Change Apache listening port
 RUN sed -i "s/Listen 80/Listen ${PORT}/" /etc/apache2/ports.conf
 
-# Install MySQLi extension
-RUN docker-php-ext-install mysqli
+# Install MySQLi extension and other PHP extensions
+RUN docker-php-ext-install mysqli pdo pdo_mysql
 
 # Suppress deprecation warnings
 RUN echo "error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT" > /usr/local/etc/php/conf.d/error-reporting.ini
@@ -25,7 +31,9 @@ RUN apt-get update && apt-get install -y \
     default-mysql-client \
     wget \
     unzip \
-    && docker-php-ext-install mysqli pdo pdo_mysql
+    mariadb-server \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Download and install phpMyAdmin
 RUN wget https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.zip -O /tmp/phpmyadmin.zip \
@@ -36,34 +44,26 @@ RUN wget https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.zi
 # Copy configuration file for phpMyAdmin
 COPY config.inc.php /var/www/html/phpmyadmin/
 
-# Copy the SQL file into the container
-COPY moh.sql /tmp/moh.sql
-
-# Install and configure MariaDB server
-RUN apt-get update && apt-get install -y mariadb-server \
-    && sed -i "s/^\(bind-address\s*=\s*\).*\$/\10.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf \
+# Configure MariaDB server
+RUN sed -i "s/^\(bind-address\s*=\s*\).*\$/\10.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf \
     && sed -i "s/^\(port\s*=\s*\).*\$/\1${DB_PORT}/" /etc/mysql/mariadb.conf.d/50-server.cnf \
     && service mariadb start \
     && mysql -e "CREATE DATABASE rep;" \
     && mysql -e "CREATE USER 'bootmy'@'%' IDENTIFIED BY 'pmapass';" \
     && mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'bootmy'@'%';" \
-    && mysql -e "FLUSH PRIVILEGES;" 
+    && mysql -e "FLUSH PRIVILEGES;"
+
 # Copy the wait-for-mysql script
 COPY wait-for-mysql.sh /usr/local/bin/wait-for-mysql.sh
 RUN chmod +x /usr/local/bin/wait-for-mysql.sh
 
-RUN npm install -g yarn
-RUN yarn install
-
-RUN cd frontend
-# Install pnpm globally
-RUN npm install -g pnpm
-
 # Install frontend dependencies
-RUN pnpm install
+RUN cd frontend && pnpm install && cd ..
 
-RUN cd ..
-RUN php artisan db:seed
+# Run database migrations and seed
+RUN php artisan migrate --seed
+
+# Build frontend assets
 RUN yarn deploy
 
 # Start MariaDB and Apache in the foreground
