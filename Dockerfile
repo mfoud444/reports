@@ -78,11 +78,11 @@ COPY wait-for-mysql.sh /usr/local/bin/wait-for-mysql.sh
 RUN chmod +x /usr/local/bin/wait-for-mysql.sh
 
 # Install frontend dependencies
-RUN cd frontent && pnpm install && cd ..
+# RUN cd frontend && pnpm install && cd ..
 
 # Run database migrations and seed
 # 
-
+RUN yarn front:build
 # Build frontend assets
 RUN yarn deploy
 RUN php artisan migrate:seed
