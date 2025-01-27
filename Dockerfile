@@ -25,12 +25,12 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 
 # Copy your application files
 COPY . .
-
+RUN ls -la
 # Copy .env.example to .env
 RUN cp .env.example .env
 
 # Install Composer dependencies
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install
 
 # Generate application key
 RUN php artisan key:generate
