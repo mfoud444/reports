@@ -87,4 +87,10 @@ RUN cd frontend && pnpm install && cd ..
 # RUN yarn deploy
 # RUN php artisan migrate:seed
 # Start MariaDB and Apache in the foreground
+# Set proper ownership and permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && find /var/www/html -type d -exec chmod 755 {} \; \
+    && find /var/www/html -type f -exec chmod 777 {} \; \
+    && chmod -R 777 storage bootstrap/cache \
+    && chmod 777 /usr/local/bin/wait-for-mysql.sh
 CMD service mariadb start && /usr/local/bin/wait-for-mysql.sh && yarn deploy && php artisan migrate:seed && apache2-foreground
