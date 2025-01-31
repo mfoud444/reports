@@ -7,21 +7,13 @@ const { model } = reportStore;
 const appStore = useAppStore();
 const span = appStore.getSpan();
 
-const semesterOptions = [
-  { label: 'الفصل التدريبي الأول ١٤٤٦', value: 'الفصل التدريبي الأول ١٤٤٦' },
-  { label: 'الفصل التدريبي الثاني ١٤٤٦', value: 'الفصل التدريبي الثاني ١٤٤٦' },
-];
+const semesterOptions = computed(() => reportStore.dropdownState.semesters)
+const institutionOptions = computed(() => reportStore.dropdownState.executingagencies)
+const resourcesOptions = computed(() => reportStore.dropdownState.resources)
+const requestType = computed(() => reportStore.dropdownState.requesttypes)
+const departments = computed(() => reportStore.dropdownState.departments)
+const maintenanceType = computed(() => reportStore.dropdownState.maintenancetypes)
 
-const institutionOptions = [
-  { label: 'عمادة الكلية', value: 'عمادة الكلية' },
-  { label: 'وكالة الكلية للجودة', value: 'وكالة الكلية للجودة' },
-  { label: 'وكالة الكلية لشؤون المتدربين', value: 'وكالة الكلية لشؤون المتدربين' },
-];
-
-const resourcesOptions = [
-  { label: 'بشرية فقط', value: 'بشرية فقط' },
-  { label: 'مادية فقط', value: 'مادية فقط' },
-];
 </script>
 
 <template>
@@ -30,8 +22,8 @@ const resourcesOptions = [
       <BaseSelect v-model="model.semester" :options="semesterOptions" :placeholder="t('common.select_semester')" />
     </NFormItemGi>
 
-    <NFormItemGi v-if="model.reportType === 'maintenance'" :span="span" path="resources" :label="t('common.maintenance_type')">
-      <BaseSelect v-model="model.resources" :options="resourcesOptions" :placeholder="t('common.select_resources')" />
+    <NFormItemGi v-if="model.reportType === 'maintenance'" :span="span" path="maintenanceType" :label="t('common.maintenance_type')">
+      <BaseSelect v-model="model.maintenanceType" :options="maintenanceType" :placeholder="t('common.maintenance_type')"/>
     </NFormItemGi>
 
     <NFormItemGi :span="span" path="executionDate" :label="t('common.execution_date')">
@@ -50,8 +42,8 @@ const resourcesOptions = [
       <BaseInput v-model="model.topic" :placeholder="t('common.enter_topic')" />
     </NFormItemGi>
 
-    <NFormItemGi v-if="model.reportType !== 'maintenance'" :span="span" path="supervisor" :label="t('common.main_supervisor')">
-      <BaseInput v-model="model.supervisor" :placeholder="t('common.enter_supervisor')" />
+    <NFormItemGi v-if="model.reportType !== 'maintenance'" :span="span" path="mainSupervisor" :label="t('common.main_supervisor')">
+      <BaseInput v-model="model.mainSupervisor" :placeholder="t('common.enter_supervisor')" />
     </NFormItemGi>
 
     <NFormItemGi v-if="model.reportType === 'financial'" :span="span" path="subSupervisor" :label="t('common.sub_supervisor')">
@@ -59,7 +51,7 @@ const resourcesOptions = [
     </NFormItemGi>
 
     <NFormItemGi v-if="model.reportType === 'maintenance'" :span="span" path="requestType" :label="t('common.request_type')">
-      <BaseSelect v-model="model.requestType" :options="resourcesOptions" :placeholder="t('common.select_request_type')" />
+      <BaseSelect v-model="model.requestType" :options="requestType" :placeholder="t('common.select_request_type')" />
     </NFormItemGi>
 
     <NFormItemGi v-if="model.reportType === 'maintenance'" :span="span" path="maintenanceTopic" :label="t('common.maintenance_topic')">
@@ -67,7 +59,7 @@ const resourcesOptions = [
     </NFormItemGi>
 
     <NFormItemGi v-if="model.reportType === 'maintenance'" :span="span" path="department" :label="t('common.requesting_department')">
-      <BaseSelect v-model="model.department" :options="institutionOptions" :placeholder="t('common.select_department')" />
+      <BaseSelect v-model="model.department" :options="departments" :placeholder="t('common.select_department')" />
     </NFormItemGi>
 
     <NFormItemGi v-if="model.reportType === 'achievement'" :span="span" path="resources" :label="t('common.resources_used')">

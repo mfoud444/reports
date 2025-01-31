@@ -14,7 +14,7 @@ const customRequest = async ({ file, data, onFinish, onError, onProgress }: Uplo
   try {
     onProgress({ percent: 20 });
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    model[data.bucket] = file;
+    model.stamp = file;
     onFinish();
   } catch (error: any) {
     message.error(error.message);
@@ -22,10 +22,7 @@ const customRequest = async ({ file, data, onFinish, onError, onProgress }: Uplo
   }
 };
 
-const institutionOptions = [
-  { label: 'بشرية فقط', value: 'بشرية فقط' },
-  { label: 'مادية فقط', value: 'مادية فقط' },
-];
+const institutionOptions =  computed(() => reportStore.dropdownState.executingagencies)
 </script>
 
 <template>
@@ -48,6 +45,7 @@ const institutionOptions = [
 
     <NFormItemGi :span="span" path="stamp" :label="t('common.upload_stamp')">
       <NUpload
+      v-model="model.stamp" 
         accept="image/*"
         list-type="image-card"
         :max="1"

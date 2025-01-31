@@ -7,6 +7,7 @@ export function createBaseStore<T>(tableName: string, initState: () => T, bucket
     state: () => ({
       listData: [] as T[],
       loadingInit: true,
+      dropdownList: [] as { label: string; value: any }[],
       showAdd: false,
       showUpdate: false,
       countTotalData: 0,
@@ -27,6 +28,29 @@ export function createBaseStore<T>(tableName: string, initState: () => T, bucket
         }
       },
 
+       // Global method: Fetch data and format it for dropdowns
+       async fetchDataDropDown(): Promise<void> {
+        try {
+     
+          if (this.dropdownList.length > 0) {
+            console.log('Dropdown data already fetched. Skipping fetch.');
+            return;
+          }
+          // Fetch data using the existing fetchDataAction
+          await this.fetchDataAction({ limit: 1000, offset: 0 });
+
+          // Format the fetched data into dropdown format
+          this.dropdownList = this.listData.map((item: any) => ({
+            label: item["name"], // Use the specified labelKey (default: 'name')
+            value: item["name"], // Use the specified valueKey (default: 'id')
+          }));
+
+       
+        } catch (error: any) {
+          console.error(`Error fetching dropdown data from ${tableName}:`, error.message);
+          throw error;
+        }
+      },
       async insertDataAction(newData: T): Promise<void> {
         try {
           const insertedData = await insertDataIntoTable<T>(tableName, newData);

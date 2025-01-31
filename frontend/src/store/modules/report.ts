@@ -4,10 +4,46 @@ import axios from 'axios';
 import { baseURL } from '@/utils/request/axios';
 import { ref } from 'vue';
 import { initializeModel } from '@/utils/modelUtils';
-import {  useMessage } from 'naive-ui';
+
+interface DropdownItem {
+  label: string;
+  value: any;
+}
+
+interface DropdownState {
+  areas: DropdownItem[];
+  establishments: DropdownItem[];
+  reporttypes: DropdownItem[];
+  trainingclasses: DropdownItem[];
+  executingagencies: DropdownItem[];
+  resources: DropdownItem[];
+  performanceindicators: DropdownItem[];
+  maintenancetypes: DropdownItem[];
+  requesttypes: DropdownItem[];
+  maintenancerequestingagencies: DropdownItem[];
+  departments: DropdownItem[];
+  semesters: DropdownItem[];
+}
+
+
+
 export const useReportStore = defineStore('report', {
   state: () => ({
     model: ref<API.ReportModel>(initializeModel()),
+    dropdownState : ref<DropdownState>({
+      areas: [],
+      establishments: [],
+      reporttypes: [],
+      trainingclasses: [],
+      executingagencies: [],
+      resources: [],
+      performanceindicators: [],
+      maintenancetypes: [],
+      requesttypes: [],
+      maintenancerequestingagencies: [],
+      departments: [],
+      semesters: []
+    }),
     steps: [] as Array<{ title: string; status: 'process' | 'wait' | 'finish' }>,
     showProcessCompletion:false,
     currentStep: 0,
@@ -30,18 +66,18 @@ export const useReportStore = defineStore('report', {
         executionProcedures: [{ required: true, message: t('common.executionProceduresRequired'), trigger: ['input', 'blur'] }],
         challenges: [{ required: true, message: t('common.challengesRequired'), trigger: ['input', 'blur'] }],
         recommendations: [{ required: true, message: t('common.recommendationsRequired'), trigger: ['input', 'blur'] }],
-        documentation1: [{ required: false, message: t('common.documentation1Required'), trigger: ['input', 'blur'] }],
-        documentation2: [{ required: false, message: t('common.documentation2Required'), trigger: ['input', 'blur'] }],
-        documentation3: [{ required: false, message: t('common.documentation3Required'), trigger: ['input', 'blur'] }],
-        documentation4: [{ required: false, message: t('common.documentation4Required'), trigger: ['input', 'blur'] }],
+        // documentation1: [{ required: false, message: t('common.documentation1Required'), trigger: ['input', 'blur'] }],
+        // documentation2: [{ required: false, message: t('common.documentation2Required'), trigger: ['input', 'blur'] }],
+        // documentation3: [{ required: false, message: t('common.documentation3Required'), trigger: ['input', 'blur'] }],
+        // documentation4: [{ required: false, message: t('common.documentation4Required'), trigger: ['input', 'blur'] }],
         performanceIndicator: [{ required: true, message: t('common.performanceIndicatorRequired'), trigger: ['input', 'blur'] }],
-        target: [{ required: false, message: t('common.targetRequired'),   trigger: ['blur', 'change'] }],
-        achieved: [{ required: false, message: t('common.achievedRequired'),   trigger: ['blur', 'change'] }],
+        // target: [{ required: false, message: t('common.targetRequired'),   trigger: ['blur', 'change'] }],
+        // achieved: [{ required: false, message: t('common.achievedRequired'),   trigger: ['blur', 'change'] }],
         percentage: [{ required: true, message: t('common.percentageRequired'),   trigger: ['blur', 'change'] }],
         reporter: [{ required: true, message: t('common.reporterRequired'), trigger: ['input', 'blur'] }],
         reportDate: [{ required: false, message: t('common.reportDateRequired'), trigger: ['blur', 'change'] }],
         approver: [{ required: true, message: t('common.approverRequired'), trigger: ['input', 'blur'] }],
-        stamp: [{ required: true, message: t('common.stampRequired'), trigger: ['input', 'blur'] }],
+        stamp: [{ required: false, message: t('common.stampRequired'), trigger: ['blur', 'change'] }],
         generalGoal: [{ required: true, message: t('common.generalGoalRequired'), trigger: ['input', 'blur'] }],
         mainSupervisor: [{ required: true, message: t('common.mainSupervisorRequired'), trigger: ['input', 'blur'] }],
         subSupervisor: [{ required: true, message: t('common.subSupervisorRequired'), trigger: ['input', 'blur'] }],
@@ -56,6 +92,55 @@ export const useReportStore = defineStore('report', {
     },
   }),
   actions: {
+    async fetchData(): Promise<void> {
+      try {
+        // loading.value = true;
+        // error.value = false;
+    
+        storesSettings.areas().fetchDataDropDown();
+   
+   await storesSettings.establishments().fetchDataDropDown();
+
+   await storesSettings.reporttypes().fetchDataDropDown();
+
+   await storesSettings.trainingclasses().fetchDataDropDown();
+
+   await storesSettings.executingagencies().fetchDataDropDown();
+
+   await storesSettings.resources().fetchDataDropDown();
+
+   await storesSettings.performanceindicators().fetchDataDropDown();
+
+   await storesSettings.maintenancetypes().fetchDataDropDown();
+
+   await storesSettings.requesttypes().fetchDataDropDown();
+ 
+await storesSettings.maintenancerequestingagencies().fetchDataDropDown();
+  
+await storesSettings.departments().fetchDataDropDown();
+await storesSettings.semesters().fetchDataDropDown(); 
+
+this.dropdownState.semesters = storesSettings.semesters().dropdownList;
+        // Fetch all dropdown data and update the state
+        this.dropdownState.areas =  storesSettings.areas().dropdownList;
+        this.dropdownState.establishments =  storesSettings.establishments().dropdownList;
+        this.dropdownState.reporttypes =  storesSettings.reporttypes().dropdownList;
+        this.dropdownState.trainingclasses =  storesSettings.trainingclasses().dropdownList;
+        this.dropdownState.executingagencies =  storesSettings.executingagencies().dropdownList;
+        this.dropdownState.resources =  storesSettings.resources().dropdownList;
+        this.dropdownState.performanceindicators =  storesSettings.performanceindicators().dropdownList;
+        this.dropdownState.maintenancetypes =  storesSettings.maintenancetypes().dropdownList;
+        this.dropdownState.requesttypes =  storesSettings.requesttypes().dropdownList;
+        this.dropdownState.maintenancerequestingagencies =  storesSettings.maintenancerequestingagencies().dropdownList;
+        this.dropdownState.departments =  storesSettings.departments().dropdownList;
+    
+      } catch (err: any) {
+        // error.value = true;
+        console.error(t('chat.dataFetchError'), err.message);
+      } finally {
+        // loading.value = false;
+      }
+    },
     initializeSteps() {
       if (this.model.reportType === 'financial' || this.model.reportType === 'maintenance') {
         this.steps = [
@@ -157,7 +242,7 @@ export const useReportStore = defineStore('report', {
          
         });
     
-        this.showFeedbackForm = false; // Hide feedback form after submission
+        this.showFeedbackForm = false; 
         this.showProcessCompletion = false;
       } catch (error: any) {
      
@@ -168,14 +253,16 @@ export const useReportStore = defineStore('report', {
     },
     nextStep() {
       if (this.currentStep < this.steps.length - 1) {
+        this.steps[this.currentStep].status = 'process';
         this.currentStep++;
         this.steps[this.currentStep].status = 'process';
       }
     },
     prevStep() {
       if (this.currentStep > 0) {
+        this.steps[this.currentStep].status = 'wait';
         this.currentStep--;
-        this.steps[this.currentStep].status = 'process';
+        // this.steps[this.currentStep].status = 'wait';
       }
     },
   },

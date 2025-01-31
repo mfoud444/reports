@@ -47,4 +47,8 @@ Route::get('report-types/{id}/statistics', [ReportTypeController::class, 'statis
 
 Route::post('/report-processes/{reportProcessId}/feedback', [ReportProcessController::class, 'saveFeedback']);
 
+use App\Http\Controllers\SemesterController;
+
+Route::apiResource('semesters', SemesterController::class);
+
 

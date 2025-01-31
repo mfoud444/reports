@@ -13,7 +13,8 @@ const servicesControls = [
   { key: "maintenancetypes", icon: "mdi:wrench", label: "Maintenance Types" },
   { key: "requesttypes", icon: "mdi:file-document", label: "Request Types" },
   { key: "maintenancerequestingagencies", icon: "mdi:account-hard-hat", label: "Maintenance Requesting Agencies" },
-  { key: "departments", icon: "mdi:domain", label: "Departments" }
+  { key: "departments", icon: "mdi:domain", label: "Departments" },
+  { key: "semesters", icon: "mdi:calendar", label: "Semesters" }
 ];
 
 // Generic function to initialize state for a given service

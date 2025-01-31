@@ -1,21 +1,82 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { NCard, NTable, NInput } from 'naive-ui';
+import { storeToRefs } from 'pinia';
+const reportStore = useReportStore();
+const { model } = storeToRefs(reportStore); // Make model reactive
 
+// Initialize rows with reactive model data
 const rows = ref([
-  { id: 1, type: '1', revenue: '', expense: '' },
-  { id: 2, type: '2', revenue: '', expense: '' },
-  { id: 3, type: '3', revenue: '', expense: '' },
-  { id: 4, type: '4', revenue: '', expense: '' },
-  { id: 5, type: '5', revenue: '', expense: '' },
-  { id: 6, type: '6', revenue: '', expense: '' },
-  { id: 7, type: '7', revenue: '', expense: '' },
-  { id: 8, type: '8', revenue: '', expense: '' },
+  {
+    id: 1,
+    type: model.value.revenueType1 ,
+    revenue: model.value.revenueAmount1,
+    expense: model.value.expenseAmount1,
+  },
+  {
+    id: 2,
+    type: model.value.revenueType2 ,
+    revenue: model.value.revenueAmount2,
+    expense: model.value.expenseAmount2,
+  },
+  {
+    id: 3,
+    type: model.value.revenueType3 ,
+    revenue: model.value.revenueAmount3,
+    expense: model.value.expenseAmount3,
+  },
+  {
+    id: 4,
+    type: model.value.revenueType4 ,
+    revenue: model.value.revenueAmount4,
+    expense: model.value.expenseAmount4,
+  },
+  {
+    id: 5,
+    type: model.value.revenueType5 ,
+    revenue: model.value.revenueAmount5,
+    expense: model.value.expenseAmount5,
+  },
+  {
+    id: 6,
+    type: model.value.revenueType6 ,
+    revenue: model.value.revenueAmount6,
+    expense: model.value.expenseAmount6,
+  },
+  {
+    id: 7,
+    type: model.value.revenueType7 ,
+    revenue: model.value.revenueAmount7,
+    expense: model.value.expenseAmount7,
+  },
+  {
+    id: 8,
+    type: model.value.revenueType8 ,
+    revenue: model.value.revenueAmount8,
+    expense: model.value.expenseAmount8,
+  },
 ]);
+
+// Watch for changes in rows and update the model
+watch(
+  rows,
+  (newRows) => {
+    newRows.forEach((row, index) => {
+      const revenueTypeKey = `revenueType${index + 1}` as keyof typeof model.value;
+      const revenueAmountKey = `revenueAmount${index + 1}` as keyof typeof model.value;
+      const expenseAmountKey = `expenseAmount${index + 1}` as keyof typeof model.value;
+
+      model.value[revenueTypeKey] = row.type;
+      model.value[revenueAmountKey] = row.revenue;
+      model.value[expenseAmountKey] = row.expense;
+    });
+  },
+  { deep: true }
+);
 </script>
 
 <template>
- <NCard :title="t('common.revenues_and_expenses')">
+  <NCard :title="t('common.revenues_and_expenses')">
     <NTable bordered>
       <thead>
         <tr>
@@ -26,7 +87,9 @@ const rows = ref([
       </thead>
       <tbody>
         <tr v-for="row in rows" :key="row.id">
-          <td>{{ row.type }}</td>
+          <td>
+            <NInput v-model:value="row.type" placeholder="أدخل النوع" />
+          </td>
           <td>
             <NInput v-model:value="row.revenue" placeholder="أدخل المبلغ" />
           </td>

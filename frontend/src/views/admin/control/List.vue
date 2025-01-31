@@ -45,6 +45,9 @@ switch (type) {
   case 'departments':
     objStore = storesSettings.departments();
     break;
+    case 'semesters': // Added case for semesters
+    objStore = storesSettings.semesters();
+    break;
   default:
     throw new Error(`Unknown type: ${type}`);
 }

@@ -38,6 +38,56 @@ declare namespace API {
     maintenanceTopic: string;
     faultDescription: string;
     department: string;
+
+
+email:string;
+  // Revenue, Expense, Remaining, and Percentage fields
+  revenueType1: string;
+  revenueAmount1: string;
+  expenseAmount1: string;
+  remainingAmount1: string;
+  percentage1: string;
+  revenueType2: string;
+  revenueAmount2: string;
+  expenseAmount2: string;
+  remainingAmount2: string;
+  percentage2: string;
+  revenueType3: string;
+  revenueAmount3: string;
+  expenseAmount3: string;
+  remainingAmount3: string;
+  percentage3: string;
+  revenueType4: string;
+  revenueAmount4: string;
+  expenseAmount4: string;
+  remainingAmount4: string;
+  percentage4: string;
+  revenueType5: string;
+  revenueAmount5: string;
+  expenseAmount5: string;
+  remainingAmount5: string;
+  percentage5: string;
+  revenueType6: string;
+  revenueAmount6: string;
+  expenseAmount6: string;
+  remainingAmount6: string;
+  percentage6: string;
+  revenueType7: string;
+  revenueAmount7: string;
+  expenseAmount7: string;
+  remainingAmount7: string;
+  percentage7: string;
+  revenueType8: string;
+  revenueAmount8: string;
+  expenseAmount8: string;
+  remainingAmount8: string;
+  percentage8: string;
+
+  // Total fields
+  totalRevenue: string;
+  totalExpenses: string;
+  totalRemaining: string;
+  totalPercentage: string;
   }
 
  interface ReportStep {

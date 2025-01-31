@@ -21,7 +21,7 @@ export default {
 
   common: {
 
-
+   semesters: "الفصول الدراسية",
     dashboard: "لوحة التحكم",
     areas: "المناطق",
     establishments: "المنشآت",

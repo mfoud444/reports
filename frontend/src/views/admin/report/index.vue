@@ -14,6 +14,106 @@ const reportStore = useReportStore();
 const { model, steps, showProcessCompletion, currentStep, rules, showFeedbackForm, feedback } = storeToRefs(reportStore);
 const { generationReport, nextStep, prevStep, submitFeedback } = reportStore;
 const message = useMessage();
+const isLoading = ref(false)
+const isLoadingEmail = ref(false)
+const showEmailModal = ref(false);
+const isFormValid = ref(false); // Track form validity
+const validateAndNextStep = async (): Promise<boolean> => {
+  try {
+    // Validate the form
+    await formRef.value?.validate();
+    // If validation passes, proceed to the next step
+    nextStep();
+    return true; // Validation succeeded
+  } catch (errors) {
+    // If validation fails, show an error message
+    message.error('يرجى ملء جميع الحقول المطلوبة قبل المتابعة.');
+    return false; // Validation failed
+  }
+};
+
+// const generationReportEmailAction = async () => {
+//   try {
+//     // Run validation
+//     const isValidationSuccessful = await validateAndNextStep();
+
+//     // Stop execution if validation fails
+//     if (!isValidationSuccessful) {
+//       return; // Exit the function
+//     }
+
+//     // Proceed with report generation if validation succeeds
+//     isLoadingEmail.value = true;
+//     await generationReport();
+//     message.success('تم إرسال التقرير بنجاح!');
+//   } catch (error: any) {
+//     console.error('Error submitting feedback:', error.message);
+//     message.error('فشل إرسال التقرير. يرجى المحاولة مرة أخرى.');
+//   } finally {
+//     isLoadingEmail.value = false;
+//   }
+// };
+const generationReportEmailAction = async () => {
+  try {
+    // Run validation
+    const isValidationSuccessful = await validateAndNextStep();
+
+    // Stop execution if validation fails
+    if (!isValidationSuccessful) {
+      return; // Exit the function
+    }
+
+    // Show the email modal
+    showEmailModal.value = true;
+  } catch (error: any) {
+    console.error('Error submitting feedback:', error.message);
+    message.error('فشل إرسال التقرير. يرجى المحاولة مرة أخرى.');
+  }
+};
+
+const submitEmail = async () => {
+  try {
+    // Validate email input
+    if (!model.value.email || !model.value.email.includes('@')) {
+      message.error('يرجى إدخال عنوان بريد إلكتروني صحيح.');
+      return;
+    }
+
+    // Proceed with report generation
+    isLoadingEmail.value = true;
+    await generationReport(); // Pass emailAddress.value if needed
+    message.success('تم إرسال التقرير بنجاح!');
+    showEmailModal.value = false; // Close the modal
+  } catch (error: any) {
+    console.error('Error submitting feedback:', error.message);
+    message.error('فشل إرسال التقرير. يرجى المحاولة مرة أخرى.');
+  } finally {
+    model.value.email = ""
+    isLoadingEmail.value = false;
+  }
+};
+
+const generationReportAction = async () => {
+  try {
+    // Run validation
+    const isValidationSuccessful = await validateAndNextStep();
+
+    // Stop execution if validation fails
+    if (!isValidationSuccessful) {
+      return; // Exit the function
+    }
+ model.value.email = ""
+    // Proceed with report generation if validation succeeds
+    isLoading.value = true;
+    await generationReport();
+    message.success('تم إرسال التقرير بنجاح!');
+  } catch (error: any) {
+    console.error('Error submitting feedback:', error.message);
+    message.error('فشل إرسال التقرير. يرجى المحاولة مرة أخرى.');
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 const handleFeedback = (isLiked: boolean) => {
   feedback.value.isLiked = isLiked; 
@@ -29,6 +129,18 @@ const handleFeedback = (isLiked: boolean) => {
       }
 };
 const { isMobile } = useBasicLayout();
+const formRef = ref<InstanceType<typeof NForm> | null>(null); // Reference to the form
+
+
+// Watch form validity
+const checkFormValidity = async () => {
+  try {
+    await formRef.value?.validate();
+    isFormValid.value = true; // Form is valid
+  } catch (errors) {
+    isFormValid.value = false; // Form is invalid
+  }
+};
 </script>
 <template>
   
@@ -48,7 +160,7 @@ const { isMobile } = useBasicLayout();
         </NSteps>
         </div>
       <div class="">
-        <NForm :model="model" :rules="rules" size="large">
+        <NForm ref="formRef" :model="model" :rules="rules" size="large">
          
           <Step0 v-if="currentStep === 0" />
           <Step1 v-if="currentStep === 1" />
@@ -57,6 +169,19 @@ const { isMobile } = useBasicLayout();
           <Step32 v-if="currentStep === 3 && model.reportType === 'financial'" />
           <Step4 v-if="currentStep === 4 && model.reportType === 'achievement'" />
           <Step5 v-if="(currentStep === 5 &&  model.reportType === 'achievement') || (currentStep === 4 && model.reportType !== 'achievement') " />
+
+          <NModal v-model:show="showEmailModal">
+        <NCard style="width: 400px; margin: 0 auto;" :title="t('common.send_email')">
+          <NInput
+            v-model:value="model.email"
+            placeholder="أدخل عنوان البريد الإلكتروني"
+            class="mb-4"
+          />
+          <NButton type="primary" style="background-color: blue;" @click="submitEmail">
+            {{ t('common.submit') }}
+          </NButton>
+        </NCard>
+      </NModal>
         </NForm>
 
         <!-- Navigation Buttons -->
@@ -65,13 +190,13 @@ const { isMobile } = useBasicLayout();
             {{ t('common.previous') }}
           </NButton>
           <div class="space-x-3">
-            <NButton type="success" @click="generationReport" style="background-color: blue;" v-if="currentStep === steps.length - 1">
+            <NButton type="success" :loading="isLoadingEmail" :disabled="isLoadingEmail" @click="generationReportEmailAction" style="background-color: blue;" v-if="currentStep === steps.length - 1">
               {{ t('common.send_email') }}
             </NButton>
-            <NButton v-if="currentStep === steps.length - 1" type="primary" style="background-color: blue;" @click="generationReport">
+            <NButton :loading="isLoading"   :disabled="isLoading" v-if="currentStep === steps.length - 1" type="primary" style="background-color: blue;" @click="generationReportAction">
               {{ t('common.submit') }}
             </NButton>
-            <NButton v-if="currentStep != steps.length - 1" type="primary" style="background-color: blue;" @click="nextStep">
+            <NButton  v-if="currentStep != steps.length - 1" type="primary" style="background-color: blue;" @click="validateAndNextStep">
               {{ t('common.next') }}
             </NButton>
           </div>

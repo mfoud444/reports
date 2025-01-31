@@ -9,11 +9,10 @@ const { model } = reportStore;
 const appStore = useAppStore();
 const span = appStore.getSpan();
 
+
+
 // Options for select fields
-const regionOptions = [
-  { label: 'الباحة', value: 'الباحة' },
-  { label: 'نجران', value: 'نجران' },
-];
+const regionOptions = computed(() => reportStore.dropdownState.areas)
 
 const collegeOptions = [
   { label: 'الكلية التقنية بجدة', value: 'الكلية التقنية بجدة' },
@@ -25,15 +24,18 @@ const reportTypeOptions = [
   { label: 'تقرير مالي', value: 'financial' },
   { label: 'تقرير صيانة', value: 'maintenance' },
 ];
-reportStore.initializeSteps();
 
-// Watch for changes in reportType and reinitialize steps
 watch(
   () => reportStore.model.reportType,
   () => {
     reportStore.initializeSteps();
   }
 );
+
+onMounted(async () => {
+  reportStore.initializeSteps();
+    await  reportStore.fetchData();
+});
 </script>
 
 <template>

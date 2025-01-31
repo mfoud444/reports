@@ -37,7 +37,8 @@ const servicesControls = [
   { key: "maintenance-types", icon: "mdi:wrench", label: "common.maintenance_types" },
   { key: "request-types", icon: "mdi:file-document", label: "common.request_types" },
   { key: "maintenance-requesting-agencies", icon: "mdi:account-hard-hat", label: "common.maintenance_requesting_agencies" },
-  { key: "departments", icon: "mdi:domain", label: "common.departments" }
+  { key: "departments", icon: "mdi:domain", label: "common.departments" },
+  { key: "semesters", icon: "mdi:calendar", label: "common.semesters" } // Added semester
 ];
 
 async function handleUpdateValue(key: string, item: MenuOption) {
@@ -126,18 +127,18 @@ const menuOptions: MenuOption[] = [
       })),
     ],
   },
-  // {
-  //   type: 'group',
-  //   label: t('common.settings'),
-  //   key: 'settings',
-  //   children: [
-  //     {
-  //       label: t('common.themes'),
-  //       key: 'themes',
-  //       icon: iconRender({ icon: 'mdi:palette' }),
-  //     },
-  //   ],
-  // },
+  {
+    type: 'group',
+    label: t('common.settings'),
+    key: 'settings',
+    children: [
+      {
+        label: t('common.themes'),
+        key: 'themes',
+        icon: iconRender({ icon: 'mdi:palette' }),
+      },
+    ],
+  },
 ];
 
 const inverted = ref(false);

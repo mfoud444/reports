@@ -69,16 +69,12 @@ export default defineConfig((env) => {
         '@': path.resolve(process.cwd(), 'src'),
       },
     },
-    base:  "" ,
+    base:  "/reports/public/app/" ,
     plugins: setupPlugins(viteEnv),
     server: {
-      port: 3000, // Your desired port for the Vite server
+      host: 'jct.edu.sa',
       proxy: {
-        // '/': {  // This will proxy any request starting with /app
-        //   target: 'http://localhost/laravel-vue-manual/public/app', // The backend server where the request will be forwarded
-        //   changeOrigin: true,  // Needed to properly handle the target URL's origin
-        //   rewrite: (path) => path.replace(/^\/app/, '')  // Optional, rewrite the URL path before sending it
-        // },
+       
       
       '/api': {
           target: viteEnv.VITE_APP_API_BASE_URL,
@@ -102,7 +98,7 @@ export default defineConfig((env) => {
     //   },
     // },
     build: {
-      outDir: "./../public/app",
+      outDir: "../public/app",
       reportCompressedSize: false,
       sourcemap: false,
       commonjsOptions: {

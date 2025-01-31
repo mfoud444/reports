@@ -48,7 +48,7 @@ export default {
     is_active: "Is Active", 
     created_at: "Created At", 
     updated_at: "Updated At", 
-
+ semesters: "Semesters",
     AchievementReports: "Achievement Reports",
     FinancialReports: "Financial Reports",
     MaintenanceReports: "Maintenance Reports",

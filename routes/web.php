@@ -12,10 +12,14 @@ use Illuminate\Support\Facades\Route;
 //     return file_get_contents(public_path('app/index.html'));
 // });
 
-
-Route::get('/app/{any}', function () {
+Route::get('/{anypath?}', function ($anypath = null) {
+    // Path to your index.html
     $path = public_path('app/index.html');
+    
+    // Ensure the index.html exists, otherwise return a 404 error
     abort_unless(file_exists($path), 400, 'Page is not Found!');
+    
+    // Return the contents of the index.html file
     return file_get_contents($path);
-})
-    ->name('FrontEndApp');
+})->where('anypath', '.*')  // This regular expression will match any path after /reports/
+  ->name('FrontEndApp');

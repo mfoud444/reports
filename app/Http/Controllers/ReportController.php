@@ -10,7 +10,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 use App\Models\ReportProcess;;
 use Dompdf\Options;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ReportMail;
 class ReportController extends Controller
 {
     public function generateReport(Request $request)
@@ -19,6 +20,7 @@ class ReportController extends Controller
             $data = $request->all();
             $reportType = $request->input('reportType', 'achievement');
             $region = $request->input('region', 'الباحة');
+            $email = $request->input('email'); 
             $documentationFiles = [];
             $tempFiles = [];
             for ($i = 1; $i <= 4; $i++) {
@@ -157,6 +159,33 @@ class ReportController extends Controller
 
             // Read the PDF content
             $pdfContent = file_get_contents($pdfPath);
+
+            if ($email && $email != '') {
+                try {
+                    // Send email with the PDF attachment
+                    Mail::to($email)->send(new ReportMail($pdfPath));
+            
+                    // Delete the file after sending
+                    if (file_exists($pdfPath)) {
+                        unlink($pdfPath);
+                    }
+            
+                    return response()->json([
+                        'success' => true,
+                        'reportProcessId' => $reportProcess->id,
+                        'message' => 'Report sent to email successfully.',
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Error sending email:', ['error' => $e->getMessage()]);
+            
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Failed to send email. Please try again later.',
+                        'error' => $e->getMessage(), // Optional: include for debugging (remove in production)
+                    ], 500);
+                }
+            }
+            
 
             // Encode the file as Base64 to include it in the response
             $responseData = [
