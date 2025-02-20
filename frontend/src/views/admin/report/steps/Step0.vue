@@ -8,6 +8,7 @@ const { model } = reportStore;
 
 const appStore = useAppStore();
 const span = appStore.getSpan();
+const labelStyle = appStore.getLabelStyle();
 
 
 
@@ -40,15 +41,15 @@ onMounted(async () => {
 
 <template>
     <NGrid :x-gap="12" :y-gap="8">
-    <NFormItemGi :span="span" path="region" :label="t('common.region')">
+    <NFormItemGi :label-style="labelStyle" :span="span" path="region" :label="t('common.region')">
       <BaseSelect v-model="model.region" :options="regionOptions" :placeholder="t('common.select_region')" />
     </NFormItemGi>
 
-    <NFormItemGi :span="span" path="college" :label="t('common.college')">
+    <NFormItemGi :label-style="labelStyle" :span="span" path="college" :label="t('common.college')">
       <BaseSelect v-model="model.college" :options="collegeOptions" :placeholder="t('common.select_college')" />
     </NFormItemGi>
 
-    <NFormItemGi :span="span" path="reportType" :label="t('common.report_type')">
+    <NFormItemGi :label-style="labelStyle" :span="span" path="reportType" :label="t('common.report_type')">
       <NRadioGroup v-model:value="model.reportType">
         <NRadio v-for="option in reportTypeOptions" :key="option.value" :value="option.value">
           {{ option.label }}

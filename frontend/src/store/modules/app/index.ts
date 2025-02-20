@@ -42,6 +42,9 @@ export const useAppStore = defineStore('app-store', {
       const span = computed(() => (isMobile ? 24 : 24));
       return span.value
     },
+    getLabelStyle() {
+      return { fontWeight: 'bold', fontSize: '18px' };
+    },
 
     recordState() {
       setLocalSetting(this.$state)

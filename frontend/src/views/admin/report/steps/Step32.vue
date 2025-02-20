@@ -4,6 +4,8 @@ import { NCard, NTable, NInput } from 'naive-ui';
 import { storeToRefs } from 'pinia';
 const reportStore = useReportStore();
 const { model } = storeToRefs(reportStore); // Make model reactive
+const appStore = useAppStore();
+const labelStyle = appStore.getLabelStyle();
 
 // Initialize rows with reactive model data
 const rows = ref([

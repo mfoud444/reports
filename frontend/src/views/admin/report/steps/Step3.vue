@@ -8,6 +8,7 @@ const { model } = reportStore;
 const appStore = useAppStore();
 const span = appStore.getSpan();
 const message = useMessage();
+const labelStyle = appStore.getLabelStyle();
 
 const customRequest = async ({ file, data, onFinish, onError, onProgress }: UploadCustomRequestOptions) => {
   try {
@@ -24,7 +25,7 @@ const customRequest = async ({ file, data, onFinish, onError, onProgress }: Uplo
 
 <template>
   <NGrid :x-gap="12" :y-gap="8">
-    <NFormItemGi :span="12" path="documentation1" :label="t('common.documentation_1')">
+    <NFormItemGi :label-style="labelStyle" :span="12" path="documentation1" :label="t('common.image_1')">
       <NUpload
         accept="image/*"
         list-type="image-card"
@@ -34,7 +35,7 @@ const customRequest = async ({ file, data, onFinish, onError, onProgress }: Uplo
       />
     </NFormItemGi>
 
-    <NFormItemGi :span="12" path="documentation2" :label="t('common.documentation_2')">
+    <NFormItemGi :label-style="labelStyle" :span="12" path="documentation2" :label="t('common.image_2')">
       <NUpload
         accept="image/*"
         list-type="image-card"
@@ -44,7 +45,7 @@ const customRequest = async ({ file, data, onFinish, onError, onProgress }: Uplo
       />
     </NFormItemGi>
 
-    <NFormItemGi :span="12" path="documentation3" :label="t('common.documentation_3')">
+    <NFormItemGi :label-style="labelStyle" :span="12" path="documentation3" :label="t('common.image_3')">
       <NUpload
         accept="image/*"
         list-type="image-card"
@@ -54,8 +55,8 @@ const customRequest = async ({ file, data, onFinish, onError, onProgress }: Uplo
       />
     </NFormItemGi>
 
-    <NFormItemGi :span="span" path="documentation4" :label="t('common.documentation_4')">
-      <BaseInput v-model="model.documentation4" :placeholder="t('common.enter_documentation_4')" />
+    <NFormItemGi :label-style="labelStyle" :span="span" path="documentation4" :label="t('common.tweet_video')">
+      <BaseInput v-model="model.documentation4" :placeholder="t('common.enter_tweet_video_link')" type="url" />
     </NFormItemGi>
   </NGrid>
 </template>

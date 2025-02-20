@@ -1,5 +1,7 @@
 <template>
   <NInput
+    :maxlength="type === 'textarea' ? 300 : 100"
+    show-count
     :value="modelValue"
     @update:value="$emit('update:modelValue', $event)"
     @keyup.enter="$emit('enter')"

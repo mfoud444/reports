@@ -10,6 +10,7 @@ import Step32 from './steps/Step32.vue';
 import { NSteps, NStep, NForm, NButton, } from 'naive-ui';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import defaultLogo from '@/assets/logo.png'
+import FeedbackForm from '@/components/FeedbackForm.vue';
 const reportStore = useReportStore();
 const { model, steps, showProcessCompletion, currentStep, rules, showFeedbackForm, feedback } = storeToRefs(reportStore);
 const { generationReport, nextStep, prevStep, submitFeedback } = reportStore;
@@ -17,7 +18,9 @@ const message = useMessage();
 const isLoading = ref(false)
 const isLoadingEmail = ref(false)
 const showEmailModal = ref(false);
+const statistics = ref({ happy: 0, sad: 0 });
 const isFormValid = ref(false); // Track form validity
+
 const validateAndNextStep = async (): Promise<boolean> => {
   try {
     // Validate the form
@@ -32,27 +35,7 @@ const validateAndNextStep = async (): Promise<boolean> => {
   }
 };
 
-// const generationReportEmailAction = async () => {
-//   try {
-//     // Run validation
-//     const isValidationSuccessful = await validateAndNextStep();
 
-//     // Stop execution if validation fails
-//     if (!isValidationSuccessful) {
-//       return; // Exit the function
-//     }
-
-//     // Proceed with report generation if validation succeeds
-//     isLoadingEmail.value = true;
-//     await generationReport();
-//     message.success('تم إرسال التقرير بنجاح!');
-//   } catch (error: any) {
-//     console.error('Error submitting feedback:', error.message);
-//     message.error('فشل إرسال التقرير. يرجى المحاولة مرة أخرى.');
-//   } finally {
-//     isLoadingEmail.value = false;
-//   }
-// };
 const generationReportEmailAction = async () => {
   try {
     // Run validation
@@ -60,7 +43,13 @@ const generationReportEmailAction = async () => {
 
     // Stop execution if validation fails
     if (!isValidationSuccessful) {
-      return; // Exit the function
+      return;
+    }
+
+    if (!isEvaluated.value) {
+      showProcessCompletion.value = true;
+      showFeedbackForm.value = true;
+      return;
     }
 
     // Show the email modal
@@ -93,6 +82,27 @@ const submitEmail = async () => {
   }
 };
 
+const handleFeedback = async (feedbackData: { isLiked: boolean }) => {
+  try {
+    feedback.value.isLiked = feedbackData.isLiked;
+    
+    // Add proper error handling for the network request
+   await submitFeedback();
+    
+  } catch (error: any) {
+    console.error('Error submitting feedback:', error);
+    throw error; // Propagate error to FeedbackForm component
+  }
+};
+
+const handleGoBack = () => {
+  showFeedbackForm.value = false;
+  showProcessCompletion.value = false;
+  prevStep();
+};
+
+const isEvaluated = computed(() => feedback.value.isLiked !== undefined);
+
 const generationReportAction = async () => {
   try {
     // Run validation
@@ -100,9 +110,16 @@ const generationReportAction = async () => {
 
     // Stop execution if validation fails
     if (!isValidationSuccessful) {
-      return; // Exit the function
+      return;
     }
- model.value.email = ""
+
+    if (!isEvaluated.value) {
+      showProcessCompletion.value = true;
+      showFeedbackForm.value = true;
+      return;
+    }
+
+    model.value.email = "";
     // Proceed with report generation if validation succeeds
     isLoading.value = true;
     await generationReport();
@@ -115,19 +132,6 @@ const generationReportAction = async () => {
   }
 };
 
-const handleFeedback = (isLiked: boolean) => {
-  feedback.value.isLiked = isLiked; 
- try{ 
-  submitFeedback(); 
-     message.success('Feedback submitted successfully!');
-     
-      } catch (error: any) {
-        const message = useMessage();
-
-        console.error('Error submitting feedback:', error.message);
-        message.error('Failed to submit feedback. Please try again.');
-      }
-};
 const { isMobile } = useBasicLayout();
 const formRef = ref<InstanceType<typeof NForm> | null>(null); // Reference to the form
 
@@ -160,7 +164,14 @@ const checkFormValidity = async () => {
         </NSteps>
         </div>
       <div class="">
-        <NForm ref="formRef" :model="model" :rules="rules" size="large">
+        <NForm 
+          ref="formRef" 
+         
+          :model="model" 
+          :rules="rules" 
+          size="large"
+          
+        >
          
           <Step0 v-if="currentStep === 0" />
           <Step1 v-if="currentStep === 1" />
@@ -177,7 +188,7 @@ const checkFormValidity = async () => {
             placeholder="أدخل عنوان البريد الإلكتروني"
             class="mb-4"
           />
-          <NButton type="primary" style="background-color: blue;" @click="submitEmail">
+          <NButton type="primary" @click="submitEmail">
             {{ t('common.submit') }}
           </NButton>
         </NCard>
@@ -189,14 +200,14 @@ const checkFormValidity = async () => {
           <NButton v-if="currentStep > 0" @click="prevStep">
             {{ t('common.previous') }}
           </NButton>
-          <div class="space-x-3">
-            <NButton type="success" :loading="isLoadingEmail" :disabled="isLoadingEmail" @click="generationReportEmailAction" style="background-color: blue;" v-if="currentStep === steps.length - 1">
+          <div class="flex gap-4">
+            <NButton type="success" :loading="isLoadingEmail" :disabled="isLoadingEmail" @click="generationReportEmailAction"  v-if="currentStep === steps.length - 1">
               {{ t('common.send_email') }}
             </NButton>
-            <NButton :loading="isLoading"   :disabled="isLoading" v-if="currentStep === steps.length - 1" type="primary" style="background-color: blue;" @click="generationReportAction">
+            <NButton :loading="isLoading"   :disabled="isLoading" v-if="currentStep === steps.length - 1" type="primary"  @click="generationReportAction">
               {{ t('common.submit') }}
             </NButton>
-            <NButton  v-if="currentStep != steps.length - 1" type="primary" style="background-color: blue;" @click="validateAndNextStep">
+            <NButton type="success"  v-if="currentStep != steps.length - 1"   @click="validateAndNextStep">
               {{ t('common.next') }}
             </NButton>
           </div>
@@ -205,43 +216,48 @@ const checkFormValidity = async () => {
       </template>
 
       <template v-else>
-        <div v-if="showFeedbackForm" class="feedback-form">
-          <div class="success-message">
-            <h1 class="text-3xl font-bold text-green-600">🎉 {{ t('common.congratulations') }} 🎉</h1>
-            <p class="text-lg text-gray-700 mt-2">{{ t('common.process_completed') }}</p>
-        
-          </div>
-
-          <div class="feedback-actions mt-8">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ t('common.feedback_prompt') }}</h2>
-            <div class="flex justify-center space-x-6">
-              <!-- Like Button -->
-              <button
-                @click="handleFeedback(true)"
-                class="flex flex-col items-center p-4 rounded-lg hover:bg-green-50 transition-colors"
-              >
-                <SvgIcon icon="entypo:emoji-happy" class="w-12 h-12 text-green-600" />
-                <span class="mt-2 text-lg text-green-600">{{ t('common.like') }}</span>
-              </button>
-
-              <!-- Dislike Button -->
-              <button
-                @click="handleFeedback(false)"
-                class="flex flex-col items-center p-4 rounded-lg hover:bg-red-50 transition-colors"
-              >
-                <SvgIcon icon="iconoir:emoji-sad" class="w-12 h-12 text-red-600" />
-                <span class="mt-2 text-lg text-red-600">{{ t('common.dislike') }}</span>
-              </button>
-            </div>
-          </div>
-
-          <NButton type="primary" class="mt-8" style="background-color: blue;" @click="showFeedbackForm = false; showProcessCompletion = false; prevStep">
-            {{ t('common.go_back') }}
-          </NButton>
-        </div>
+        <FeedbackForm 
+          v-if="showFeedbackForm"
+          :onSubmitFeedback="handleFeedback"
+          :onGoBack="handleGoBack"
+        />
       </template>
 
-      <div class="pt-8 text-center text-gray-500">اعداد وكالة الجودة بالكلية التقنية بجدة - ٢٠٢٤</div>
+      <div class="pt-8">
+        <div class="flex flex-col items-center gap-4">
+          <div class="flex justify-center space-x-12 gap-4">
+            <!-- Happy Statistics -->
+            <div class="flex flex-col items-center">
+              <div class="relative">
+                <SvgIcon 
+                  icon="entypo:emoji-happy" 
+                  class="w-10 h-10 text-green-600"
+                />
+                <span class="absolute -top-2 -right-2 bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
+                  {{ statistics.happy }}
+                </span>
+              </div>
+              <span class="mt-2 text-sm text-green-600">{{ t('common.satisfied_users') }}</span>
+            </div>
+
+            <!-- Sad Statistics -->
+            <div class="flex flex-col items-center">
+              <div class="relative">
+                <SvgIcon 
+                  icon="iconoir:emoji-sad" 
+                  class="w-10 h-10 text-red-600"
+                />
+                <span class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
+                  {{ statistics.sad }}
+                </span>
+              </div>
+              <span class="mt-2 text-sm text-red-600">{{ t('common.unsatisfied_users') }}</span>
+            </div>
+          </div>
+          <div class="text-center text-gray-500">اعداد وكالة الجودة بالكلية التقنية بجدة - ٢٠٢٤</div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -263,14 +279,40 @@ const checkFormValidity = async () => {
   margin-top: 2rem;
 }
 
-button {
-  border: none;
-  background: none;
-  cursor: pointer;
+
+
+.feedback-actions button {
+  position: relative;
+  transition: all 0.3s ease;
 }
 
-button:hover {
+.feedback-actions button:not(:disabled):hover {
   transform: scale(1.05);
-  transition: transform 0.2s ease;
+}
+
+.feedback-actions button:disabled {
+  cursor: not-allowed;
+}
+
+.feedback-actions .count-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.statistics-footer {
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+  margin-top: 1rem;
 }
 </style>

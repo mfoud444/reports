@@ -21,7 +21,7 @@ export default {
 
   common: {
 
-   semesters: "الفصول الدراسية",
+    semesters: "الفصول الدراسية",
     dashboard: "لوحة التحكم",
     areas: "المناطق",
     establishments: "المنشآت",
@@ -39,10 +39,10 @@ export default {
     manage_data_reports: "إدارة تقارير البيانات",
     settings: "الإعدادات",
     themes: "السمات",
-    name: "الاسم", 
-    is_active: "نشط", 
-    created_at: "تم الإنشاء في", 
-    updated_at: "تم التحديث في", 
+    name: "الاسم",
+    is_active: "نشط",
+    created_at: "تم الإنشاء في",
+    updated_at: "تم التحديث في",
 
     AchievementReports: "تقارير الإنجازات",
     FinancialReports: "تقارير مالية",
@@ -96,19 +96,26 @@ export default {
     resources: 'الموارد',
     selectResources: 'اختر الموارد',
     operationalGoal: 'الهدف التشغيلي',
-   
+
     documentation1: 'الوثيقة 1',
     documentation2: 'الوثيقة 2',
     documentation3: 'الوثيقة 3',
     documentation4: 'الوثيقة 4',
+    image_1: 'الصورة 1',
+    image_2: 'الصورة 2',
+    image_3: 'الصورة 3',
+    tweet_video: 'فيديو تويتر',
+    enter_tweet_video_link: 'أدخل رابط فيديو تويتر',
     performanceIndicator: 'مؤشر الأداء',
     selectPerformanceIndicator: 'اختر مؤشر الأداء',
     target: 'الهدف',
     achieved: 'المتحقق',
     percentage: 'النسبة المئوية',
-    reporter: 'المُبلغ',
+    reporter: 'مقدم الطلب',
+    enter_reporter: 'أدخل اسم مقدم الطلب',
     reportDate: 'تاريخ التقرير',
-    approver: 'الموافق',
+    approver: 'المسؤول المعتمد',
+    enter_approver: 'أدخل اسم المسؤول المعتمد',
     stamp: 'الختم',
     generalGoal: 'الهدف العام',
     mainSupervisor: 'المشرف الرئيسي',
@@ -132,18 +139,18 @@ export default {
     supervisorRequired: 'يرجى إدخال اسم المشرف.',
     resourcesRequired: 'يرجى اختيار الموارد.',
     operationalGoalRequired: 'يرجى إدخال الهدف التشغيلي.',
-   
-    documentation1Required: 'يرجى رفع الوثيقة 1.',
-    documentation2Required: 'يرجى رفع الوثيقة 2.',
-    documentation3Required: 'يرجى رفع الوثيقة 3.',
-    documentation4Required: 'يرجى إدخال الوثيقة 4.',
+
+    documentation1Required: 'يرجى رفع الصورة 1.',
+    documentation2Required: 'يرجى رفع الصورة 2.',
+    documentation3Required: 'يرجى رفع الصورة 3.',
+    documentation4Required: 'يرجى إدخال رابط فيديو تويتر.',
     performanceIndicatorRequired: 'يرجى اختيار مؤشر الأداء.',
     targetRequired: 'يرجى إدخال الهدف.',
     achievedRequired: 'يرجى إدخال القيمة المتحققة.',
     percentageRequired: 'يرجى إدخال النسبة المئوية.',
-    reporterRequired: 'يرجى إدخال اسم المُبلغ.',
+    reporterRequired: 'يرجى إدخال اسم مقدم الطلب.',
     reportDateRequired: 'يرجى اختيار تاريخ التقرير.',
-    approverRequired: 'يرجى إدخال اسم الموافق.',
+    approverRequired: 'يرجى إدخال اسم المسؤول المعتمد.',
     stampRequired: 'يرجى رفع الختم.',
     generalGoalRequired: 'يرجى إدخال الهدف العام.',
     mainSupervisorRequired: 'يرجى إدخال اسم المشرف الرئيسي.',
@@ -158,17 +165,13 @@ export default {
     departmentRequired: 'يرجى اختيار القسم.',
 
 
-
-
-    region: 'المنطقة',
     select_region: 'اختر المنطقة',
-  
-    college: 'الكليّة',
+
     select_college: 'اختر الكليّة',
-  
+
     report_type: 'نوع التقرير',
- 
-    semester: 'الفصل التدريبي',
+
+
     select_semester: 'اختر الفصل التدريبي',
 
     execution_date: 'تاريخ التنفيذ',
@@ -176,7 +179,7 @@ export default {
     maintenance_time: 'وقت الصيانة',
     executing_authority: 'الجهة المنفذة',
     select_institution: 'اختر الجهة',
- 
+
     report_topic: 'موضوع التقرير',
     enter_topic: 'أدخل الموضوع',
     main_supervisor: 'المسؤول الرئيسي',
@@ -187,20 +190,20 @@ export default {
     select_request_type: 'اختر نوع الطلب',
     maintenance_topic: 'موضوع الصيانة',
     enter_maintenance_topic: 'أدخل موضوع الصيانة',
-    requesting_department: 'القسم الطالب',
+    requesting_department: 'الطلب مرفوع من:',
     select_department: 'اختر القسم',
     resources_used: 'الموارد المستخدمة',
     select_resources: 'اختر الموارد',
- 
+    maintenance_date: " تاریخ الصیانة",
     general_goal: 'الهدف العام',
     enter_general_goal: 'أدخل الهدف العام',
     fault_description: 'وصف العطل',
     enter_fault_description: 'أدخل وصف العطل',
     execution_procedures: 'إجراءات التنفيذ',
     enter_execution_procedures: 'أدخل إجراءات التنفيذ',
-    challenges: 'التحديات',
+
     enter_challenges: 'أدخل التحديات',
-    recommendations: 'التوصيات',
+
     enter_recommendations: 'أدخل التوصيات',
     documentation_1: 'الوثيقة 1',
     documentation_2: 'الوثيقة 2',
@@ -209,17 +212,15 @@ export default {
     enter_documentation_4: 'أدخل الوثيقة 4',
     performance_indicator: 'مؤشر الأداء',
     select_performance_indicator: 'اختر مؤشر الأداء',
-    target: 'المستهدف',
+
     enter_target: 'أدخل المستهدف',
-    achieved: 'المتحقق',
+
     enter_achieved: 'أدخل المتحقق',
-    percentage: 'النسبة المئوية',
+
     enter_percentage: 'أدخل النسبة المئوية',
-    reporter: 'معد التقرير',
-    enter_reporter: 'أدخل معد التقرير',
+
     report_date: 'تاريخ التقرير',
-    approver: 'المعتمد',
-    enter_approver: 'أدخل المعتمد',
+
     upload_stamp: 'رفع الختم',
     revenues_and_expenses: 'الإيرادات والمصروفات',
     revenue_type: 'نوع الإيراد',
@@ -271,7 +272,7 @@ export default {
     addNew: 'إضافة جديد',
     state: 'الولاية',
     country: 'الدولة',
-    name: 'الاسم',
+
     image: 'الصورة',
     firstName: 'الاسم الأول',
     lastName: 'الاسم الأخير',
@@ -297,8 +298,7 @@ export default {
     settingsAPP: 'إعدادات التطبيق',
     notifications: 'الإشعارات',
     addNotification: 'إضافة إشعار',
-    dashboard: 'اللوحة الرئيسية',
-    settings: 'الإعدادات',
+
     advances: 'الميزات المتقدمة',
     chatsUserAI: 'الدردشات مع الذكاء الاصطناعي',
     chatsManager: 'مدير الدردشات',
@@ -311,59 +311,60 @@ export default {
     inputData: 'بيانات الإدخال',
     outputData: 'بيانات الإخراج',
     maxTokens: 'أقصى عدد من الرموز',
-   
+    satisfied_users: 'المستخدمون الراضون',
+    unsatisfied_users: 'المستخدمون غير الراضين'
   },
 
   setting: {
-        // Arabic translations for specific keys
-        title: 'إعدادات التطبيق',
-        defaultAiModel: 'نموذج الذكاء الاصطناعي الافتراضي',
-        defaultMessage: 'الرسالة الافتراضية',
-        termsOfUseUrl: 'رابط شروط الاستخدام',
-        privacyPolicyUrl: 'رابط سياسة الخصوصية',
-        update: 'تحديث',
-        urlGooglplay: 'رابط جوجل بلاي',
-        urlAppstore: 'رابط متجر Apple',
-        urlFacebook: 'رابط فيسبوك',
-        urlYoutube: 'رابط يوتيوب',
-        urlWhatsapp: 'رابط واتساب',
-        email: 'عنوان البريد الإلكتروني',
-        urlInstagram: 'رابط إنستجرام',
-        urlTiktok: 'رابط تيك توك',
-        phoneNumber: 'رقم الهاتف',
-        fillAllFields: 'يرجى ملء جميع الحقول المطلوبة',
-        updateSuccess: 'تم تحديث الإعدادات بنجاح',
-        updateFailed: 'فشل في تحديث الإعدادات',
-        dataFetchError: 'خطأ في جلب البيانات',
-        defaultMessageRequired: 'الرسالة الافتراضية مطلوبة',
-        termsOfUseUrlRequired: 'رابط شروط الاستخدام مطلوب',
-        privacyPolicyUrlRequired: 'رابط سياسة الخصوصية مطلوب',
+    // Arabic translations for specific keys
+    title: 'إعدادات التطبيق',
+    defaultAiModel: 'نموذج الذكاء الاصطناعي الافتراضي',
+    defaultMessage: 'الرسالة الافتراضية',
+    termsOfUseUrl: 'رابط شروط الاستخدام',
+    privacyPolicyUrl: 'رابط سياسة الخصوصية',
+    update: 'تحديث',
+    urlGooglplay: 'رابط جوجل بلاي',
+    urlAppstore: 'رابط متجر Apple',
+    urlFacebook: 'رابط فيسبوك',
+    urlYoutube: 'رابط يوتيوب',
+    urlWhatsapp: 'رابط واتساب',
+    email: 'عنوان البريد الإلكتروني',
+    urlInstagram: 'رابط إنستجرام',
+    urlTiktok: 'رابط تيك توك',
+    phoneNumber: 'رقم الهاتف',
+    fillAllFields: 'يرجى ملء جميع الحقول المطلوبة',
+    updateSuccess: 'تم تحديث الإعدادات بنجاح',
+    updateFailed: 'فشل في تحديث الإعدادات',
+    dataFetchError: 'خطأ في جلب البيانات',
+    defaultMessageRequired: 'الرسالة الافتراضية مطلوبة',
+    termsOfUseUrlRequired: 'رابط شروط الاستخدام مطلوب',
+    privacyPolicyUrlRequired: 'رابط سياسة الخصوصية مطلوب',
 
 
-        // New keys
-firstName: 'الاسم الأول',
-lastName: 'الاسم الأخير',
-avatarUrl: 'رابط الصورة الشخصية',
-dateOfBirth: 'تاريخ الميلاد',
-state: 'الولاية',
-gender: 'النوع',
-userType: 'نوع المستخدم',
-country: 'البلد',
-description: 'الوصف',
-save: 'حفظ',
-reset: 'إعادة تعيين',
-success: 'تم التحديث بنجاح',
-error: 'فشل التحديث',
-fillAllField: 'يرجى تعبئة جميع الحقول المطلوبة',
-firstNameRequired: 'الاسم الأول مطلوب',
-lastNameRequired: 'الاسم الأخير مطلوب',
-avatarUrlRequired: 'رابط الصورة الشخصية مطلوب',
-dateOfBirthRequired: 'تاريخ الميلاد مطلوب',
-descriptionRequired: 'الوصف مطلوب',
-stateRequired: 'الولاية مطلوبة',
-genderRequired: 'النوع مطلوب',
-userTypeRequired: 'نوع المستخدم مطلوب',
-countryRequired: 'البلد مطلوب',
+    // New keys
+    firstName: 'الاسم الأول',
+    lastName: 'الاسم الأخير',
+    avatarUrl: 'رابط الصورة الشخصية',
+    dateOfBirth: 'تاريخ الميلاد',
+    state: 'الولاية',
+    gender: 'النوع',
+    userType: 'نوع المستخدم',
+    country: 'البلد',
+    description: 'الوصف',
+    save: 'حفظ',
+    reset: 'إعادة تعيين',
+    success: 'تم التحديث بنجاح',
+    error: 'فشل التحديث',
+    fillAllField: 'يرجى تعبئة جميع الحقول المطلوبة',
+    firstNameRequired: 'الاسم الأول مطلوب',
+    lastNameRequired: 'الاسم الأخير مطلوب',
+    avatarUrlRequired: 'رابط الصورة الشخصية مطلوب',
+    dateOfBirthRequired: 'تاريخ الميلاد مطلوب',
+    descriptionRequired: 'الوصف مطلوب',
+    stateRequired: 'الولاية مطلوبة',
+    genderRequired: 'النوع مطلوب',
+    userTypeRequired: 'نوع المستخدم مطلوب',
+    countryRequired: 'البلد مطلوب',
 
 
     setting: 'الإعدادات',
@@ -372,7 +373,7 @@ countryRequired: 'البلد مطلوب',
     config: 'إعداد',
     avatarLink: 'رابط الصورة الشخصية',
     name: 'الاسم',
-  
+
     role: 'الدور',
     temperature: 'الحرارة',
     top_p: 'أعلى_ب',
@@ -390,8 +391,8 @@ countryRequired: 'البلد مطلوب',
     profile: 'الملف الشخصي',
     select: 'Select Role',
 
-   isEmojes:'تضمين الرموز التعبيرية في الرد'
+    isEmojes: 'تضمين الرموز التعبيرية في الرد'
   },
- 
+
 
 }

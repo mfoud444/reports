@@ -9,6 +9,8 @@ import Components from 'unplugin-vue-components/vite'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 
 function setupPlugins(env: ImportMetaEnv): PluginOption[] {
+  const isDevelopment = process.env.NODE_ENV === 'development'
+  
   return [
     vue(),
     env.VITE_GLOB_APP_PWA === 'true' && VitePWA({
@@ -53,15 +55,14 @@ function setupPlugins(env: ImportMetaEnv): PluginOption[] {
     Components({
       resolvers: [NaiveUiResolver()]
     }),
-    Terminal(),
-    // Terminal({console: 'terminal'}),
-    
-  ]
+    // Only enable Terminal plugin in development mode
+    isDevelopment && Terminal({console: 'terminal'}),
+  ].filter(Boolean)
 }
 
 export default defineConfig((env) => {
   const viteEnv = loadEnv(env.mode, process.cwd()) as unknown as ImportMetaEnv
-  const isDevelopment = false;
+  const isDevelopment = process.env.NODE_ENV === 'development'
 
   return {
     resolve: {
@@ -69,34 +70,32 @@ export default defineConfig((env) => {
         '@': path.resolve(process.cwd(), 'src'),
       },
     },
-    base:  "/reports/public/app/" ,
+    base: isDevelopment ? '/' : '/reports/public/app/',
     plugins: setupPlugins(viteEnv),
-    server: {
-      host: 'jct.edu.sa',
+    server: isDevelopment ? {
+      // Development server config
+      host: '0.0.0.0',
+      port: 3000,
+      overlay: false,
+      open: false,
       proxy: {
-       
-      
-      '/api': {
+        '/api': {
           target: viteEnv.VITE_APP_API_BASE_URL,
           changeOrigin: true,
           rewrite: path => path.replace('/api/', '/'),
         },
-      
-    },},
-  
-    // server: {
-    //   host: '0.0.0.0',
-    //   port: 3000,
-    //   overlay:false,
-    //   open: false,
-    //   proxy: {
-    //     '/api': {
-    //       target: viteEnv.VITE_APP_API_BASE_URL,
-    //       changeOrigin: true,
-    //       rewrite: path => path.replace('/api/', '/'),
-    //     },
-    //   },
-    // },
+      },
+    } : {
+      // Production server config
+      host: 'jct.edu.sa',
+      proxy: {
+        '/api': {
+          target: viteEnv.VITE_APP_API_BASE_URL,
+          changeOrigin: true,
+          rewrite: path => path.replace('/api/', '/'),
+        },
+      },
+    },
     build: {
       outDir: "../public/app",
       reportCompressedSize: false,

@@ -77,14 +77,14 @@ export const useReportStore = defineStore('report', {
         reporter: [{ required: true, message: t('common.reporterRequired'), trigger: ['input', 'blur'] }],
         reportDate: [{ required: false, message: t('common.reportDateRequired'), trigger: ['blur', 'change'] }],
         approver: [{ required: true, message: t('common.approverRequired'), trigger: ['input', 'blur'] }],
-        stamp: [{ required: false, message: t('common.stampRequired'), trigger: ['blur', 'change'] }],
+        // stamp: [{ required: false, message: t('common.stampRequired'), trigger: ['blur', 'change'] }],
         generalGoal: [{ required: true, message: t('common.generalGoalRequired'), trigger: ['input', 'blur'] }],
         mainSupervisor: [{ required: true, message: t('common.mainSupervisorRequired'), trigger: ['input', 'blur'] }],
         subSupervisor: [{ required: true, message: t('common.subSupervisorRequired'), trigger: ['input', 'blur'] }],
         auditDate: [{ required: true, message: t('common.auditDateRequired'), trigger: ['blur', 'change'] }],
         maintenanceType: [{ required: true, message: t('common.maintenanceTypeRequired'), trigger: ['input', 'blur'] }],
         maintenanceDate: [{ required: true, message: t('common.maintenanceDateRequired'), trigger: ['blur', 'change'] }],
-        maintenanceTime: [{ required: true, message: t('common.maintenanceTimeRequired'), trigger: ['input', 'blur'] }],
+        maintenanceTime: [{ required: false, message: t('common.maintenanceTimeRequired'), trigger: ['input', 'blur'] }],
         requestType: [{ required: true, message: t('common.requestTypeRequired'), trigger: ['input', 'blur'] }],
         maintenanceTopic: [{ required: true, message: t('common.maintenanceTopicRequired'), trigger: ['input', 'blur'] }],
         faultDescription: [{ required: true, message: t('common.faultDescriptionRequired'), trigger: ['input', 'blur'] }],
@@ -173,7 +173,7 @@ this.dropdownState.semesters = storesSettings.semesters().dropdownList;
     
         const formData = new FormData();
         Object.keys(this.model).forEach((key) => {
-          const value = this.model[key];
+          const value = (this.model as Record<string, any>)[key];
           if (value && typeof value === 'object' && value.file) {
             formData.append(key, value.file);
           } else {
@@ -182,7 +182,7 @@ this.dropdownState.semesters = storesSettings.semesters().dropdownList;
         });
     
         // Send the request to the backend
-        const response = await axios.post(`${baseURL}generatereport`, formData, {
+        const response = await axios.post(`${baseURL}/generatereport`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -237,7 +237,7 @@ this.dropdownState.semesters = storesSettings.semesters().dropdownList;
           throw new Error('Report process ID is missing.');
         }
 
-        const response = await axios.post(`${baseURL}report-processes/${this.reportProcessId}/feedback`, {
+        const response = await axios.post(`${baseURL}/report-processes/${this.reportProcessId}/feedback`, {
           is_liked: this.feedback.isLiked,
          
         });

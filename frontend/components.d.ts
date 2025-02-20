@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BaseActionForm: typeof import('./src/components/common/BaseActionForm/index.vue')['default']
+    BaseFormItemGi: typeof import('./src/components/common/FormElements/BaseFormItemGi.vue')['default']
     BaseInput: typeof import('./src/components/common/FormElements/BaseInput.vue')['default']
     BaseInputNumber: typeof import('./src/components/common/FormElements/BaseInputNumber.vue')['default']
     BaseSelect: typeof import('./src/components/common/FormElements/BaseSelect.vue')['default']
@@ -15,6 +16,7 @@ declare module 'vue' {
     BaseUpload: typeof import('./src/components/common/FormElements/BaseUpload.vue')['default']
     Button: typeof import('./src/components/common/HoverButton/Button.vue')['default']
     DataTableBase: typeof import('./src/components/common/DataTableBase/index.vue')['default']
+    FeedbackForm: typeof import('./src/components/FeedbackForm.vue')['default']
     HoverButton: typeof import('./src/components/common/HoverButton/index.vue')['default']
     LanguageSelect: typeof import('./src/components/common/LanguageSelect/index.vue')['default']
     LoadingIcon: typeof import('./src/components/common/LoadingIcon/index.vue')['default']
