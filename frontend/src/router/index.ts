@@ -91,9 +91,12 @@ const routes: RouteRecordRaw[] = [
   },
 ]
 
+const BASE_URL = import.meta.env.MODE === 'production' 
+  ? '/reports/' 
+  : '/'
+
 export const router = createRouter({
-  // history: createWebHistory('/reports/'),
-  history: createWebHistory('/'),
+  history: createWebHistory(BASE_URL),
   routes,
   scrollBehavior: () => ({ left: 0, top: 0 }),
 })
