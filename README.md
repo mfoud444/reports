@@ -242,7 +242,7 @@ This will start the development server at `http://localhost:8000`.
 
 ### Option 2: Using Apache or Nginx:
 
-If you wish to use Apache or Nginx, configure your virtual host to point to the `public` directory of your Laravel project.
+If you wish to use Apache , configure your virtual host to point to the `public` directory of your Laravel project.
 
 ---
 
