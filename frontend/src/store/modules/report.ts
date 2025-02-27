@@ -4,6 +4,8 @@ import axios from 'axios';
 import { baseURL } from '@/utils/request/axios';
 import { ref } from 'vue';
 import { initializeModel } from '@/utils/modelUtils';
+import { v4 as uuidv4 } from 'uuid';
+import { get } from '@/utils/request';
 
 interface DropdownItem {
   label: string;
@@ -30,6 +32,10 @@ interface DropdownState {
 export const useReportStore = defineStore('report', {
   state: () => ({
     model: ref<API.ReportModel>(initializeModel()),
+    statistics: {
+      happy: 0,
+      sad: 0
+    },
     dropdownState : ref<DropdownState>({
       areas: [],
       establishments: [],
@@ -51,7 +57,7 @@ export const useReportStore = defineStore('report', {
     feedback: ref({
       isLiked: false,
     }),
-    reportProcessId: ref(null), 
+    reportProcessId: ref(""),
     rules: {
         region: [{ required: true, message: t('common.regionRequired'), trigger: ['input', 'blur'] }],
         college: [{ required: true, message: t('common.collegeRequired'), trigger: ['input', 'blur'] }],
@@ -170,8 +176,15 @@ this.dropdownState.semesters = storesSettings.semesters().dropdownList;
     async generationReport() {
       try {
         console.log("data", this.model);
-    
+        if (!this.reportProcessId) {
+          throw new Error('Report process ID is missing.');
+        }
         const formData = new FormData();
+        
+        // Add the UUID to formData
+        formData.append('id', this.reportProcessId);
+        
+        // Add other form data
         Object.keys(this.model).forEach((key) => {
           const value = (this.model as Record<string, any>)[key];
           if (value && typeof value === 'object' && value.file) {
@@ -230,25 +243,43 @@ this.dropdownState.semesters = storesSettings.semesters().dropdownList;
       }
     },
     
-
+    async fetchStatistics() {
+      try {
+        const response = await get({ method: 'GET', url: 'reportfeedbacks/count' });
+        if (response) {
+          this.statistics = {
+            happy: response.positiveFeedback || 0,
+            sad: response.negativeFeedback || 0
+          };
+        }
+      } catch (error) {
+        console.error('Error fetching feedback statistics:', error);
+      }
+    },
     async submitFeedback() {
       try {
-        if (!this.reportProcessId) {
-          throw new Error('Report process ID is missing.');
-        }
-
-        const response = await axios.post(`${baseURL}/report-processes/${this.reportProcessId}/feedback`, {
+        this.reportProcessId = uuidv4();
+      
+        const response = await axios.post(`${baseURL}/report-feedbacks`, {
           is_liked: this.feedback.isLiked,
-         
+          reportType: this.model.reportType,
+          report_process_id: this.reportProcessId,
         });
-    
-        this.showFeedbackForm = false; 
-        this.showProcessCompletion = false;
-      } catch (error: any) {
-     
 
+        if(response.status) {
+          // Increment the appropriate statistic based on feedback
+          if (this.feedback.isLiked) {
+            this.statistics.happy++;
+          } else {
+            this.statistics.sad++;
+          }
+          
+          this.showFeedbackForm = false; 
+          this.showProcessCompletion = false;
+        }
+      
+      } catch (error: any) {
         console.error('Error submitting feedback:', error.message);
-       
       }
     },
     nextStep() {

@@ -6,23 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up()
     {
         Schema::create('report_processes', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('report_type_id')->constrained()->onDelete('cascade');
-            $table->timestamp('generated_at')->useCurrent();
+            $table->uuid('id')->primary();
+            $table->foreignId('report_type_id')->constrained('report_types');
+            $table->timestamp('generated_at');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('report_processes');
     }

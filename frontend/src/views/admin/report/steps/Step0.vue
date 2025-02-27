@@ -1,4 +1,3 @@
-<!-- components/steps/Step0.vue -->
 
 <script setup lang="ts">
 import { NFormItemGi, NGrid, NRadioGroup, NRadio } from 'naive-ui';

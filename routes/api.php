@@ -41,11 +41,11 @@ Route::get('reportprocesses/count', [ReportProcessController::class, 'countByTyp
 Route::get('reportfeedbacks/count', [ReportFeedbackController::class, 'count']);
 
 // ReportFeedback Routes
-Route::apiResource('report-feedbacks', ReportFeedbackController::class);
+Route::post('report-feedbacks', [ReportFeedbackController::class, 'makeFeedback']);
 
 Route::get('report-types/{id}/statistics', [ReportTypeController::class, 'statistics']);
 
-Route::post('/report-processes/{reportProcessId}/feedback', [ReportProcessController::class, 'saveFeedback']);
+// Route::post('/report-processes/{reportProcessId}/feedback', [ReportProcessController::class, 'saveFeedback']);
 
 use App\Http\Controllers\SemesterController;
 

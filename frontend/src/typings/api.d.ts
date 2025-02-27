@@ -18,7 +18,7 @@ declare namespace API {
     documentation1: File | null;
     documentation2: File | null;
     documentation3: File | null;
-    documentation4: string | null;
+    documentation4: string;
     performanceIndicator: string;
     target: number;
     achieved: number;

@@ -8,7 +8,7 @@ use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
-use App\Models\ReportProcess;;
+use App\Models\ReportProcess;
 use Dompdf\Options;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ReportMail;
@@ -17,6 +17,12 @@ class ReportController extends Controller
     public function generateReport(Request $request)
     {
         try {
+            // Validate the UUID
+            $request->validate([
+                'id' => 'required|uuid',
+                // ... other validation rules
+            ]);
+
             $data = $request->all();
             $reportType = $request->input('reportType', 'achievement');
             $region = $request->input('region', 'الباحة');
@@ -142,14 +148,12 @@ class ReportController extends Controller
             }
             $tempDocxPath = storage_path('temp/' . Str::uuid() . '.docx');
             $templateProcessor->saveAs($tempDocxPath);
+            $tempFiles[] = $tempDocxPath; 
 
             $pdfPath = $this->convertDocxToPdfUsingAPI($tempDocxPath);
 
             
-            $reportProcess =  ReportProcess::create([
-                'report_type_id' => $this->getReportTypeId($reportType),
-                'generated_at' => now(),
-            ]);
+         
 
             foreach ($tempFiles as $file) {
                 if (file_exists($file)) {
@@ -172,7 +176,7 @@ class ReportController extends Controller
             
                     return response()->json([
                         'success' => true,
-                        'reportProcessId' => $reportProcess->id,
+                        'reportProcessId' => $request->input('id'),
                         'message' => 'Report sent to email successfully.',
                     ]);
                 } catch (\Exception $e) {
@@ -189,7 +193,7 @@ class ReportController extends Controller
 
             // Encode the file as Base64 to include it in the response
             $responseData = [
-                'reportProcessId' => $reportProcess->id,
+                'reportProcessId' =>$request->input('id'),
                 'file' => base64_encode($pdfContent),
             ];
 
@@ -200,7 +204,6 @@ class ReportController extends Controller
 
             return response()->json($responseData);
         } catch (\Exception $e) {
-
             Log::error('Error generating report:', ['error' => $e->getMessage()]);
             foreach ($tempFiles as $file) {
                 if (file_exists($file)) {
@@ -211,7 +214,6 @@ class ReportController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-                'error' => $e->getMessage(),
             ], 500);
         }
     }

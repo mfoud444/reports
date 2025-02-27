@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { NButton } from 'naive-ui';
+import { NButton, NSpin } from 'naive-ui';
 import { useMessage } from 'naive-ui';
 
 const props = defineProps<{
   onSubmitFeedback: (feedback: { isLiked: boolean }) => void;
   onGoBack: () => void;
+  loading?: boolean;
 }>();
 
 const message = useMessage();
@@ -36,58 +37,54 @@ const handleFeedback = async (isLiked: boolean) => {
 </script>
 
 <template>
-  <div class="feedback-form">
-    <div class="success-message">
-      <h1 class="text-3xl font-bold text-green-600">🎉 {{ t('common.congratulations') }} 🎉</h1>
-      <p class="text-lg text-gray-700 mt-2">{{ t('common.process_completed') }}</p>
-    </div>
-
-    <div class="feedback-actions mt-8">
-      <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ t('common.feedback_prompt') }}</h2>
-      <div class="flex flex-col items-center">
-        <div class="flex justify-center space-x-12 mb-4">
-          <!-- Like Button -->
-          <button
-            @click="handleFeedback(true)"
-            class="flex flex-col items-center p-4 rounded-lg hover:bg-green-50 transition-colors relative"
-            :class="{ 'opacity-50 cursor-not-allowed': isEvaluated }"
-            :disabled="isEvaluated"
-          >
-            <SvgIcon icon="entypo:emoji-happy" class="w-16 h-16 text-green-600" />
-            <span class="mt-2 text-lg text-green-600">{{ t('common.like') }}</span>
-      
-          </button>
-
-          <!-- Dislike Button -->
-          <button
-            @click="handleFeedback(false)"
-            class="flex flex-col items-center p-4 rounded-lg hover:bg-red-50 transition-colors relative"
-            :class="{ 'opacity-50 cursor-not-allowed': isEvaluated }"
-            :disabled="isEvaluated"
-          >
-            <SvgIcon icon="iconoir:emoji-sad" class="w-16 h-16 text-red-600" />
-            <span class="mt-2 text-lg text-red-600">{{ t('common.dislike') }}</span>
-        
-          </button>
+  <div class="feedback-form relative">
+    <NSpin :show="props.loading">
+      <div :class="{ 'opacity-50': props.loading }">
+        <div class="success-message">
+          <h1 class="text-3xl font-bold text-blue-600">{{ t('common.feedback_required') }}</h1>
+          <p class="text-lg text-gray-700 mt-2">{{ t('common.feedback_before_report') }}</p>
         </div>
-        
-        <!-- <p v-if="!isEvaluated" class="text-orange-500 font-medium mt-4">
-          {{ t('common.feedback_required') }}
-        </p> -->
-        <!-- <p v-else class="text-green-600 font-medium mt-4">
-          {{ t('common.feedback_thank_you') }}
-        </p> -->
-      </div>
-    </div>
 
-    <NButton 
-      type="primary" 
-      class="mt-8" 
-      @click="onGoBack"
-      :disabled="!isEvaluated"
-    >
-      {{ t('common.go_back') }}
-    </NButton>
+        <div class="feedback-actions mt-8">
+          <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ t('common.feedback_prompt') }}</h2>
+          <div class="flex flex-col items-center">
+            <div class="flex justify-center space-x-12 mb-4">
+              <!-- Like Button -->
+              <button
+                @click="handleFeedback(true)"
+                class="flex flex-col items-center p-4 rounded-lg hover:bg-green-50 transition-colors relative"
+                :class="{ 'opacity-50 cursor-not-allowed': isEvaluated || props.loading }"
+                :disabled="isEvaluated || props.loading"
+              >
+                <SvgIcon icon="entypo:emoji-happy" class="w-16 h-16 text-green-600" />
+                <span class="mt-2 text-lg text-green-600">{{ t('common.like') }}</span>
+              </button>
+
+              <!-- Dislike Button -->
+              <button
+                @click="handleFeedback(false)"
+                class="flex flex-col items-center p-4 rounded-lg hover:bg-red-50 transition-colors relative"
+                :class="{ 'opacity-50 cursor-not-allowed': isEvaluated || props.loading }"
+                :disabled="isEvaluated || props.loading"
+              >
+                <SvgIcon icon="iconoir:emoji-sad" class="w-16 h-16 text-red-600" />
+                <span class="mt-2 text-lg text-red-600">{{ t('common.dislike') }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <NButton 
+          type="primary" 
+          class="mt-8" 
+          @click="onGoBack"
+          :disabled="!isEvaluated || props.loading"
+          :loading="props.loading"
+        >
+          {{ t('common.go_back') }}
+        </NButton>
+      </div>
+    </NSpin>
   </div>
 </template>
 
@@ -96,6 +93,14 @@ const handleFeedback = async (isLiked: boolean) => {
   text-align: center;
   padding: 2rem;
   border-radius: 12px;
+}
+
+.success-message {
+  margin-bottom: 2rem;
+}
+
+.feedback-actions {
+  margin-top: 2rem;
 }
 
 .feedback-actions button {
@@ -109,5 +114,10 @@ const handleFeedback = async (isLiked: boolean) => {
 
 .feedback-actions button:disabled {
   cursor: not-allowed;
+}
+
+/* Add styles for loading state */
+.n-spin-container {
+  min-height: 200px; /* Adjust as needed */
 }
 </style> 

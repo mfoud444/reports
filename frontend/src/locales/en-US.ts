@@ -77,7 +77,10 @@ export default {
     sizes: "Sizes",
     effects: "Effects",
 
-
+    feedback_required: 'Feedback Required',
+    feedback_before_report: 'Please provide your feedback before generating the report',
+    feedback_prompt: 'How was your experience?',
+ 
 
     executionProcedures: 'Execution Procedures',
     executionProceduresRequired: 'Please enter execution procedures.',

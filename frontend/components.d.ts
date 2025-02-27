@@ -44,6 +44,7 @@ declare module 'vue' {
     NTabs: typeof import('naive-ui')['NTabs']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    StatisticsFooter: typeof import('./src/components/StatisticsFooter.vue')['default']
     SvgIcon: typeof import('./src/components/common/SvgIcon/index.vue')['default']
     TypeText: typeof import('./src/components/common/TypeText.vue')['default']
   }

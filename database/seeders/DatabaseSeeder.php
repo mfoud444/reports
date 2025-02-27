@@ -2,10 +2,19 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\AdministrativeArea;
+use App\Models\ReportType;
+use App\Models\Resource;
+use App\Models\PerformanceIndicator;
+use App\Models\MaintenanceType;
+use App\Models\RequestType;
+use App\Models\Department;
+use App\Models\TrainingClass;
+use App\Models\Establishment;
+use App\Models\ExecutingAgency;
+use App\Models\MaintenanceRequestingAgency;
+use App\Models\Semester;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,12 +23,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        
-
-
-
         // Insert default values into administrative_areas table
-        DB::table('administrative_areas')->insert([
+        $administrativeAreas = [
             ['name' => 'الباحة'],
             ['name' => 'الجوف'],
             ['name' => 'الحدود الشمالية'],
@@ -33,25 +38,39 @@ class DatabaseSeeder extends Seeder
             ['name' => 'عسير'],
             ['name' => 'مكة المكرمة'],
             ['name' => 'نجران'],
-        ]);
+            ['name' => 'غير ذلك'],
+        ];
+
+        foreach ($administrativeAreas as $area) {
+            AdministrativeArea::firstOrCreate(['name' => $area['name']], $area);
+        }
 
         // Insert default values into report_types table
-        DB::table('report_types')->insert([
+        $reportTypes = [
             ['name' => 'achievement', 'state' => true],
             ['name' => 'maintenance', 'state' => true],
             ['name' => 'financial', 'state' => true],
-        ]);
+        ];
+
+        foreach ($reportTypes as $reportType) {
+            ReportType::firstOrCreate(['name' => $reportType['name']], $reportType);
+        }
 
         // Insert default values into resources table
-        DB::table('resources')->insert([
+        $resources = [
             ['name' => 'بشرية فقط'],
             ['name' => 'مادية فقط'],
             ['name' => 'بشرية ومادية'],
             ['name' => 'لا يوجد'],
-        ]);
+            ['name' => 'غير ذلك'],
+        ];
+
+        foreach ($resources as $resource) {
+            Resource::firstOrCreate(['name' => $resource['name']], $resource);
+        }
 
         // Insert default values into performance_indicators table
-        DB::table('performance_indicators')->insert([
+        $performanceIndicators = [
             ['name' => 'نسبة المدربين المستفيدين من الدورات التدريبية'],
             ['name' => 'نسبة المدرب للمتدرب'],
             ['name' => 'تكلفة المتدرب السنوية (ريال سعودي)'],
@@ -76,17 +95,27 @@ class DatabaseSeeder extends Seeder
             ['name' => 'نسبة المقبولين للمتقدمين'],
             ['name' => 'معدل اشغال المرافق'],
             ['name' => 'متوسط النصاب التدريبي'],
-        ]);
+            ['name' => 'غير ذلك'],
+        ];
+
+        foreach ($performanceIndicators as $indicator) {
+            PerformanceIndicator::firstOrCreate(['name' => $indicator['name']], $indicator);
+        }
 
         // Insert default values into maintenance_types table
-        DB::table('maintenance_types')->insert([
+        $maintenanceTypes = [
             ['name' => 'صيانة دورية'],
             ['name' => 'صيانة وقائية'],
             ['name' => 'صيانة طارئة'],
-        ]);
+            ['name' => 'غير ذلك'],
+        ];
+
+        foreach ($maintenanceTypes as $type) {
+            MaintenanceType::firstOrCreate(['name' => $type['name']], $type);
+        }
 
         // Insert default values into request_types table
-        DB::table('request_types')->insert([
+        $requestTypes = [
             ['name' => 'إضاءة'],
             ['name' => 'تكييف'],
             ['name' => 'دهان'],
@@ -96,28 +125,41 @@ class DatabaseSeeder extends Seeder
             ['name' => 'صيانة أجهزة حاسب آلي'],
             ['name' => 'صيانة أجهزة عرض'],
             ['name' => 'صيانة معمل'],
-        ]);
+            ['name' => 'غير ذلك'],
+        ];
+
+        foreach ($requestTypes as $requestType) {
+            RequestType::firstOrCreate(['name' => $requestType['name']], $requestType);
+        }
 
         // Insert default values into departments table
-        DB::table('departments')->insert([
+        $departments = [
             ['name' => 'إدارة الخدمات المساندة'],
             ['name' => 'وحدة الخدمات العامة'],
             ['name' => 'وحدة السلامة والصحة المهنية'],
             ['name' => 'وحدة تقنية المعلومات'],
-        ]);
-    //     DB::table('departments')->insert([
-    //         ['name' => 'الكلية التقنية بجدة'],
-    //    ['name' => 'غير ذلك'],
-    //     ]);
+            ['name' => 'غير ذلك'],
+        ];
 
-        DB::table('training_classes')->insert([
+        foreach ($departments as $department) {
+            Department::firstOrCreate(['name' => $department['name']], $department);
+        }
+
+        // Insert default values into training_classes table
+        $trainingClasses = [
             ['name' => 'إدارة الخدمات المساندة'],
             ['name' => 'وحدة الخدمات العامة'],
             ['name' => 'وحدة السلامة والصحة المهنية'],
             ['name' => 'وحدة تقنية المعلومات'],
-        ]);
-        // Insert default values into establishments table and  maintenance_requesting_agencies and executing_agencies
-        DB::table('establishments')->insert([
+            ['name' => 'غير ذلك'],
+        ];
+
+        foreach ($trainingClasses as $trainingClass) {
+            TrainingClass::firstOrCreate(['name' => $trainingClass['name']], $trainingClass);
+        }
+
+        // Insert default values into establishments table
+        $establishments = [
             ['name' => 'عمادة الكلية'],
             ['name' => 'وكالة الكلية للجودة'],
             ['name' => 'وكالة الكلية لشؤون المتدربين'],
@@ -146,45 +188,15 @@ class DatabaseSeeder extends Seeder
             ['name' => 'مطعم الكلية'],
             ['name' => 'مكتبة الكلية'],
             ['name' => 'القرطاسية'],
-        ]);
+            ['name' => 'غير ذلك'],
+        ];
 
+        foreach ($establishments as $establishment) {
+            Establishment::firstOrCreate(['name' => $establishment['name']], $establishment);
+        }
 
-
-
-        DB::table('executing_agencies')->insert([
-            ['name' => 'عمادة الكلية'],
-            ['name' => 'وكالة الكلية للجودة'],
-            ['name' => 'وكالة الكلية لشؤون المتدربين'],
-            ['name' => 'وكالة الكلية لشؤون المدربين'],
-            ['name' => 'قسم تقنية الاعمال'],
-            ['name' => 'قسم تقنية السياحة والضيافة'],
-            ['name' => 'قسم التقنية المدنية والمعمارية'],
-            ['name' => 'قسم التقنية الكهربائية'],
-            ['name' => 'قسم التقنية الميكانيكية'],
-            ['name' => 'قسم تقنية البيئة'],
-            ['name' => 'قسم الدراسات العامة'],
-            ['name' => 'قسم التنسيق الوظيفي'],
-            ['name' => 'قسم القبول والتسجيل'],
-            ['name' => 'قسم التدرب الإلكتروني'],
-            ['name' => 'وحدة الإتصال المؤسسي'],
-            ['name' => 'وحدة التدريب التعاوني'],
-            ['name' => 'وحدة التوجيه والإرشاد'],
-            ['name' => 'وحدة تقنية المعلومات'],
-            ['name' => 'وحدة صندوق المتدربين'],
-            ['name' => 'وحدة السلامة والصحة المهنية'],
-            ['name' => 'وحدة النشاط'],
-            ['name' => 'مركز الموهبة والابتكار'],
-            ['name' => 'مركز الأعمال وخدمة المجتمع'],
-            ['name' => 'إدارة الخدمات المساندة'],
-            ['name' => 'العيادة الطبية'],
-            ['name' => 'المستودع'],
-            ['name' => 'مطعم الكلية'],
-            ['name' => 'مكتبة الكلية'],
-            ['name' => 'القرطاسية'],
-        ]);
-
-
-        DB::table('maintenance_requesting_agencies')->insert([
+        // Insert default values into executing_agencies table
+        $executingAgencies = [
             ['name' => 'عمادة الكلية'],
             ['name' => 'وكالة الكلية للجودة'],
             ['name' => 'وكالة الكلية لشؤون المتدربين'],
@@ -214,9 +226,53 @@ class DatabaseSeeder extends Seeder
             ['name' => 'مطعم الكلية'],
             ['name' => 'مكتبة الكلية'],
             ['name' => 'القرطاسية'],
-        ]);
+            ['name' => 'غير ذلك'],
+        ];
 
-        DB::table('semesters')->insert([
+        foreach ($executingAgencies as $agency) {
+            ExecutingAgency::firstOrCreate(['name' => $agency['name']], $agency);
+        }
+
+        // Insert default values into maintenance_requesting_agencies table
+        $maintenanceRequestingAgencies = [
+            ['name' => 'عمادة الكلية'],
+            ['name' => 'وكالة الكلية للجودة'],
+            ['name' => 'وكالة الكلية لشؤون المتدربين'],
+            ['name' => 'وكالة الكلية لشؤون المدربين'],
+            ['name' => 'قسم تقنية الاعمال'],
+            ['name' => 'قسم تقنية السياحة والضيافة'],
+            ['name' => 'قسم التقنية المدنية والمعمارية'],
+            ['name' => 'قسم التقنية الكهربائية'],
+            ['name' => 'قسم التقنية الميكانيكية'],
+            ['name' => 'قسم تقنية البيئة'],
+            ['name' => 'قسم الدراسات العامة'],
+            ['name' => 'قسم التنسيق الوظيفي'],
+            ['name' => 'قسم القبول والتسجيل'],
+            ['name' => 'قسم التدرب الإلكتروني'],
+            ['name' => 'وحدة الإتصال المؤسسي'],
+            ['name' => 'وحدة التدريب التعاوني'],
+            ['name' => 'وحدة التوجيه والإرشاد'],
+            ['name' => 'وحدة تقنية المعلومات'],
+            ['name' => 'وحدة صندوق المتدربين'],
+            ['name' => 'وحدة السلامة والصحة المهنية'],
+            ['name' => 'وحدة النشاط'],
+            ['name' => 'مركز الموهبة والابتكار'],
+            ['name' => 'مركز الأعمال وخدمة المجتمع'],
+            ['name' => 'إدارة الخدمات المساندة'],
+            ['name' => 'العيادة الطبية'],
+            ['name' => 'المستودع'],
+            ['name' => 'مطعم الكلية'],
+            ['name' => 'مكتبة الكلية'],
+            ['name' => 'القرطاسية'],
+            ['name' => 'غير ذلك'],
+        ];
+
+        foreach ($maintenanceRequestingAgencies as $agency) {
+            MaintenanceRequestingAgency::firstOrCreate(['name' => $agency['name']], $agency);
+        }
+
+        // Insert default values into semesters table
+        $semesters = [
             ['name' => 'الفصل التدريبي الأول ١٤٤٦'],
             ['name' => 'الفصل التدريبي الثاني ١٤٤٦'],
             ['name' => 'الفصل التدريبي الصيفي ١٤٤٦'],
@@ -229,6 +285,11 @@ class DatabaseSeeder extends Seeder
             ['name' => 'الفصل التدريبي الأول ١٤٤٩'],
             ['name' => 'الفصل التدريبي الثاني ١٤٤٩'],
             ['name' => 'الفصل التدريبي الصيفي ١٤٤٩'],
-        ]);
+            ['name' => 'غير ذلك'],
+        ];
+
+        foreach ($semesters as $semester) {
+            Semester::firstOrCreate(['name' => $semester['name']], $semester);
+        }
     }
 }

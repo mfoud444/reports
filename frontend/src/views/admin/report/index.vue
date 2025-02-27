@@ -7,18 +7,21 @@ import Step3 from './steps/Step3.vue';
 import Step4 from './steps/Step4.vue';
 import Step5 from './steps/Step5.vue';
 import Step32 from './steps/Step32.vue';
-import { NSteps, NStep, NForm, NButton, } from 'naive-ui';
+import { NSteps, NStep, NForm, NButton, NPopover, } from 'naive-ui';
 import { useBasicLayout } from '@/hooks/useBasicLayout';
 import defaultLogo from '@/assets/logo.png'
 import FeedbackForm from '@/components/FeedbackForm.vue';
+import { get } from '@/utils/request';
+import { onMounted } from 'vue';
+import axios from 'axios';
+import { baseURL } from '@/utils/request/axios';
 const reportStore = useReportStore();
-const { model, steps, showProcessCompletion, currentStep, rules, showFeedbackForm, feedback } = storeToRefs(reportStore);
+const { model, steps, showProcessCompletion, currentStep, rules, showFeedbackForm, feedback, statistics } = storeToRefs(reportStore);
 const { generationReport, nextStep, prevStep, submitFeedback } = reportStore;
 const message = useMessage();
 const isLoading = ref(false)
 const isLoadingEmail = ref(false)
 const showEmailModal = ref(false);
-const statistics = ref({ happy: 0, sad: 0 });
 const isFormValid = ref(false); // Track form validity
 
 const validateAndNextStep = async (): Promise<boolean> => {
@@ -46,16 +49,11 @@ const generationReportEmailAction = async () => {
       return;
     }
 
-    if (!isEvaluated.value) {
-      showProcessCompletion.value = true;
-      showFeedbackForm.value = true;
-      return;
-    }
-
-    // Show the email modal
-    showEmailModal.value = true;
+    // Show feedback form first
+    showProcessCompletion.value = true;
+    showFeedbackForm.value = true;
   } catch (error: any) {
-    console.error('Error submitting feedback:', error.message);
+    console.error('Error:', error.message);
     message.error('فشل إرسال التقرير. يرجى المحاولة مرة أخرى.');
   }
 };
@@ -86,12 +84,34 @@ const handleFeedback = async (feedbackData: { isLiked: boolean }) => {
   try {
     feedback.value.isLiked = feedbackData.isLiked;
     
-    // Add proper error handling for the network request
-   await submitFeedback();
+    // Submit feedback
+    await submitFeedback();
+    
+    // After feedback submission, generate report
+    isLoading.value = true;
+    if (showEmailModal.value) {
+      // Handle email report generation
+      if (!model.value.email || !model.value.email.includes('@')) {
+        message.error('يرجى إدخال عنوان بريد إلكتروني صحيح.');
+        return;
+      }
+      await generationReport();
+      showEmailModal.value = false;
+    } else {
+      // Handle normal report generation
+      await generationReport();
+    }
+    
+    message.success('تم إرسال التقرير بنجاح!');
     
   } catch (error: any) {
-    console.error('Error submitting feedback:', error);
-    throw error; // Propagate error to FeedbackForm component
+    console.error('Error:', error);
+    message.error('فشل إرسال التقرير. يرجى المحاولة مرة أخرى.');
+  } finally {
+    isLoading.value = false;
+    model.value.email = "";
+    showFeedbackForm.value = false;
+    showProcessCompletion.value = false;
   }
 };
 
@@ -113,22 +133,13 @@ const generationReportAction = async () => {
       return;
     }
 
-    if (!isEvaluated.value) {
-      showProcessCompletion.value = true;
-      showFeedbackForm.value = true;
-      return;
-    }
-
-    model.value.email = "";
-    // Proceed with report generation if validation succeeds
-    isLoading.value = true;
-    await generationReport();
-    message.success('تم إرسال التقرير بنجاح!');
+    // Show feedback form first
+    showProcessCompletion.value = true;
+    showFeedbackForm.value = true;
+   
   } catch (error: any) {
-    console.error('Error submitting feedback:', error.message);
+    console.error('Error:', error.message);
     message.error('فشل إرسال التقرير. يرجى المحاولة مرة أخرى.');
-  } finally {
-    isLoading.value = false;
   }
 };
 
@@ -145,6 +156,11 @@ const checkFormValidity = async () => {
     isFormValid.value = false; // Form is invalid
   }
 };
+
+// Call fetchStatistics when component mounts
+onMounted(() => {
+  reportStore.fetchStatistics();
+});
 </script>
 <template>
   
@@ -157,7 +173,7 @@ const checkFormValidity = async () => {
     :src="defaultLogo"
   />
    </div>
-      <template v-if="!showProcessCompletion">
+    
         <div class=" text-center " >
           <NSteps class="w-full" :current="currentStep" style="margin-bottom: 20px; width: 100%;">
           <NStep v-for="(step, index) in steps" :key="index" :title="t(step.title)" :status="step.status" />
@@ -213,50 +229,17 @@ const checkFormValidity = async () => {
           </div>
         </div>
         </div>
-      </template>
-
-      <template v-else>
+    
+      <NModal  v-model:show="showFeedbackForm">
+        <NCard style="width: 400px; margin: 0 auto;" :title="t('common.feedback_required')">
         <FeedbackForm 
-          v-if="showFeedbackForm"
-          :onSubmitFeedback="handleFeedback"
-          :onGoBack="handleGoBack"
+        :onSubmitFeedback="handleFeedback"
+  :onGoBack="handleGoBack"
+  :loading="isLoading"
         />
-      </template>
-
-      <div class="pt-8">
-        <div class="flex flex-col items-center gap-4">
-          <div class="flex justify-center space-x-12 gap-4">
-            <!-- Happy Statistics -->
-            <div class="flex flex-col items-center">
-              <div class="relative">
-                <SvgIcon 
-                  icon="entypo:emoji-happy" 
-                  class="w-10 h-10 text-green-600"
-                />
-                <span class="absolute -top-2 -right-2 bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
-                  {{ statistics.happy }}
-                </span>
-              </div>
-              <span class="mt-2 text-sm text-green-600">{{ t('common.satisfied_users') }}</span>
-            </div>
-
-            <!-- Sad Statistics -->
-            <div class="flex flex-col items-center">
-              <div class="relative">
-                <SvgIcon 
-                  icon="iconoir:emoji-sad" 
-                  class="w-10 h-10 text-red-600"
-                />
-                <span class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
-                  {{ statistics.sad }}
-                </span>
-              </div>
-              <span class="mt-2 text-sm text-red-600">{{ t('common.unsatisfied_users') }}</span>
-            </div>
-          </div>
-          <div class="text-center text-gray-500">اعداد وكالة الجودة بالكلية التقنية بجدة - ٢٠٢٤</div>
-        </div>
-      </div>
+        </NCard>
+      </NModal>
+      <StatisticsFooter :statistics="statistics" />
 
     </div>
   </div>

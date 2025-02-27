@@ -3,24 +3,58 @@
 namespace App\Http\Controllers;
 
 use App\Models\ReportFeedback;
-use Illuminate\Http\Request;
 use App\Models\ReportProcess;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 class ReportFeedbackController extends Controller
 {
+
+
+  
+
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function makeFeedback(Request $request)
     {
-        $validated = $request->validate([
-            'report_process_id' => 'required|exists:report_processes,id',
-            'is_liked' => 'boolean'
-        ]);
+        try {
+        
+            DB::beginTransaction();
 
-        $feedback = ReportFeedback::create($validated);
-        return response()->json($feedback, 201);
+            $reportProcess = ReportProcess::find($request->report_process_id);
+            if (!$reportProcess) {
+                $reportProcess = ReportProcess::create([
+                    'id' => $request->report_process_id,
+                    'report_type_id' => $this->getReportTypeId($request->reportType),
+                    'generated_at' => now(),
+                ]);
+            }
+            
+
+            // Create feedback
+            $feedback = ReportFeedback::create([
+                'report_process_id' => $request->report_process_id,
+                'is_liked' => $request->is_liked
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+              
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error creating feedback and process:', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while saving feedback.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -57,10 +91,16 @@ class ReportFeedbackController extends Controller
         return response()->json(null, 204);
     }
 
+
+      private function getReportTypeId($reportType)
+    {
+        // Implement logic to fetch the report type ID from the database
+        $reportTypeModel = \App\Models\ReportType::where('name', $reportType)->first();
+        return $reportTypeModel ? $reportTypeModel->id : null;
+    }
     /**
  * Save feedback for a specific report process.
  */
-
 public function count(Request $request)
 {
     $startDate = $request->query('startDate');
@@ -74,9 +114,15 @@ public function count(Request $request)
         $query->whereBetween('created_at', [$startDate, $endDate]);
     }
 
-    // Count feedback entries
-    $count = $query->count();
+    // Count total, positive, and negative feedback
+    $positive_feedback = $query->clone()->where('is_liked', true)->count();
+    $negative_feedback = $query->clone()->where('is_liked', false)->count();
+    $total = $positive_feedback + $negative_feedback;
 
-    return response()->json(['count' => $count]);
+    return response()->json([
+        'total' => $total,
+        'positive_feedback' => $positive_feedback,
+        'negative_feedback' => $negative_feedback
+    ]);
 }
 }

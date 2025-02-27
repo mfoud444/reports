@@ -62,8 +62,9 @@ export default {
     like: "إعجاب",
     dislike: "عدم إعجاب",
     go_back: "العودة",
-
-
+    feedback_required: 'التقييم  مطلوب ',
+    feedback_before_report: 'يرجى تقديم  التقييم قبل إنشاء التقرير',
+   
     theme_control: "تحكم في السمة",
     select_theme: "اختر السمة",
     general: "عام",
@@ -105,7 +106,7 @@ export default {
     image_2: 'الصورة 2',
     image_3: 'الصورة 3',
     tweet_video: 'فيديو تويتر',
-    enter_tweet_video_link: 'أدخل رابط فيديو تويتر',
+    enter_tweet_video_link: 'أدخل رابط',
     performanceIndicator: 'مؤشر الأداء',
     selectPerformanceIndicator: 'اختر مؤشر الأداء',
     target: 'الهدف',

@@ -6,23 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up()
     {
+        // Drop the table if it exists
+        Schema::dropIfExists('report_feedback');
+        
         Schema::create('report_feedback', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('report_process_id')->constrained()->onDelete('cascade');
-            $table->boolean('is_liked')->default(false);
+            $table->uuid('report_process_id');
+            $table->boolean('is_liked');
             $table->timestamps();
+
+            $table->foreign('report_process_id')
+                  ->references('id')
+                  ->on('report_processes')
+                  ->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('report_feedback');
     }
