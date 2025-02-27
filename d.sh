@@ -1,5 +1,5 @@
 cp config.json frontend/src/utils/config.json
-yarn deploy
+cd frontend && pnpm build && cd ..
 mv server.php index.php
 sed -i 's/ini_set('\''display_errors'\'', 1);/ini_set('\''display_errors'\'', 0);/' index.php
 git add .
