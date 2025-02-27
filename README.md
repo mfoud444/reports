@@ -78,7 +78,7 @@ Ensure you have the following installed on your machine:
 - **Yarn** (for managing backend dependencies)
 - **PNPM** (for managing frontend dependencies)
 - **MySQL** or **SQLite** (for the database)
-- **Apache** or **Nginx** (for serving the app, optional if using `artisan serve`)
+- **Apache**  (for serving the app, optional if using `artisan serve`)
 
 ---
 
@@ -281,7 +281,4 @@ composer install
 yarn install
 pnpm install
 ```
----
-
-Feel free to reach out if you have any questions or issues! Happy coding! 
 
